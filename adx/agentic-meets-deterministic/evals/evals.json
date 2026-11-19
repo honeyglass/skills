@@ -18,6 +18,12 @@
       "prompt": "Our agent runs database migrations with the vendor's dbmigrate CLI. It is closed source, we cannot change it. When a run times out the agent tries again, and twice now a migration was applied two times. How should I set up the agent's skill so this becomes reliable?",
       "expected_output": "The agent notes that the fixed tool lacks a check the flow needs (whether a migration already took effect before a retry) and stops to ask the person, offering a thin wrapper that adds the check and the refusal format (recommended) or an approval step by the person, each with its trade-off. It does not invent behavior of dbmigrate it could not see; unknown behavior is marked unknown.",
       "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "ORIKO_REPO is a checkout of oriko (https://github.com/honeyglass/oriko), a CLI that keeps CVs and tailors them to job postings, with an agent skill in .claude/skills/oriko/SKILL.md. Please review the skill together with the CLI (cli/, core/, entry point bin/oriko.ts): is the agent's flow as reliable as the tool? If you run the CLI, pass '--home examples' and only read, or add '--dry-run'. Never touch ~/.oriko and change no file.",
+      "expected_output": "A review in the result shape that changes no file; every CLI call carries '--home examples' and writes nothing. The split, the contract and the flow are written from what the skill and the code do now. The contract is reported as mostly sound, with evidence: checks in layers with all issues of a layer at once, a refused call writes nothing, refusals with code, path, hint, kind and a command, exit codes 0, 1, 2, unknown options and fields refused; the review does not call these missing. Findings name their checklist item and a change, and include most of: the rule that a profile never changes a date, employer, job title or level, and that jobs stay newest first, stands only in the skill while 'profile set' accepts such a profile (only list items are checked against the master); the back edges '6 Report to 3 Draft' and '11 Interview to 0 Setup' have no bound; states that call the tool lack a row for its refusal ('profile set' in 3 Draft, 'build' in 5 Build, the edit commands in 8 Write), and the kinds ask, retry and bug stand in a table outside the transition table; a request to only preview, check or build an existing profile has no row from 0 Setup; STOP has no section of its own. What the reviewer could not see is marked unknown.",
+      "files": []
     }
   ]
 }

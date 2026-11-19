@@ -3,20 +3,26 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "I wrote a small Node CLI for our release notes, it's in TOOL_DIR (entry point bin/notes.js). Our coding agent keeps getting it wrong. Can you review my CLI for agents and tell me which Agent DX rules it meets? Don't change anything yet.",
-      "expected_output": "Mode review. A verdict table with all 15 rules, each verdict met, partly, missing or n/a, each with evidence (a command run in a scratch folder with exit code and output, or a file and line); n/a only with a reason; gaps ordered by harm to an agent; no file of the tool changed.",
+      "prompt": "ORIKO_REPO is a checkout of the oriko CLI (https://github.com/honeyglass/oriko, a CV tool for agents). Start it with 'node bin/oriko.ts' from that folder. Review it against the Agent DX rules and tell me which ones it meets. It ships sample data, so pass '--home examples' to every call, and run only commands that read or that take '--dry-run'. Never touch ~/.oriko and don't change any file.",
+      "expected_output": "Mode review. Every call carries '--home examples'; every writing command runs with '--dry-run'; no file of the repository changes. A verdict table with all 15 rules, each with evidence from a run (command, exit code, decisive output) or a file and line. The table reports as met, with a run as evidence: raw JSON input ('profile set --json'), schema at runtime ('schema', 'schema profile'), JSON when piped, dry runs, exit codes 0 and 1 with a kind, options that list ('show --cv'), next steps (the field 'next'), nothing passes silently (an unknown option and an unknown command are refused in one answer, 'oriko block' lists its actions). It does not call a rule missing that the tool meets. It finds at least one real gap, such as: a refusal whose hint says to run a command but carries no 'command' ('UNKNOWN_BLOCK' from 'profile set' for a new profile, 'UNKNOWN_STYLE'), or 'build' answering its argument mistakes one per call. Exit code 2 is marked 'code only'. Gaps are ordered by harm to an agent.",
       "files": []
     },
     {
       "id": 2,
-      "prompt": "make the CLI in TOOL_DIR agent friendly. it prints errors as plain text and exits 1 for everything. careful, our deploy scripts parse its text output when piped, those must keep working",
-      "expected_output": "Mode fix. Check and report first; the design marks switching piped output to JSON as breaking and stops to ask the user, offering a way to keep text output (such as a flag); non-breaking gaps (exit codes 0, 1, 2 only if callers do not rely on exit 1, errors with code, path, message and hint) are designed; nothing is changed before the user answers the breaking question.",
-      "files": []
+      "prompt": "I wrote a small Node CLI for our release notes, it's in evals/files/notes-cli (entry point bin/notes.js). Our coding agent keeps getting it wrong. Can you review my CLI for agents and tell me which Agent DX rules it meets? Don't change anything yet.",
+      "expected_output": "Mode review. The tool runs only in a scratch folder (it writes notes.json into the working directory); no file under evals/files/notes-cli changes. A verdict table with all 15 rules, each verdict met, partly, missing or n/a, each with evidence; n/a only with a reason. Nearly every rule is missing or partly. The gaps name what the code does: 'add' writes notes.json before it checks the version (not all or nothing), unknown options are dropped and a command is guessed from its first letters ('rem', 'l', no command at all runs 'list'), 'export --file ../x' writes outside the folder, every failure exits 1 with the same sentence or a stack trace, a banner line stands on stdout, there is no JSON output, no schema, no dry run and no agent skill. The gaps are ordered by harm: the silent ones (guessing, half writes, the path) first.",
+      "files": ["evals/files/notes-cli/bin/notes.js"]
     },
     {
       "id": 3,
+      "prompt": "make the CLI in evals/files/notes-cli agent friendly. it prints errors as plain text and exits 1 for everything. careful, our deploy scripts parse its text output when piped, those must keep working",
+      "expected_output": "Mode fix. Check and report first; the design marks switching piped output to JSON as breaking and stops to ask the user, offering a way to keep text output (such as a flag); it also marks as breaking that a short command such as 'rem' and an unknown option are now refused, and that the banner leaves stdout. Non-breaking gaps (errors with code, path, message and hint, a schema command, a dry run, checks before the first write) are designed; exit codes 0, 1, 2 are non-breaking only if callers do not rely on exit 1. Nothing is changed before the user answers the breaking question.",
+      "files": ["evals/files/notes-cli/bin/notes.js"]
+    },
+    {
+      "id": 4,
       "prompt": "Build me a CLI in TypeScript that manages a list of bookmarks in a JSON file (add, remove, list, tag). It will mostly be driven by Claude, so it should be agent-friendly from day one.",
-      "expected_output": "Mode build. A design line for every one of the 15 rules (or n/a with a reason, such as plan before the file); the tool answers one JSON shape with ok, issues and next, exit codes 0, 1, 2, a schema command, dry runs for add, remove and tag, a strict parser, paths kept inside the data folder, writes all or nothing; tests per rule; a shipped agent skill; a fresh probe per rule in the hand-over table.",
+      "expected_output": "Mode build. A design line for every one of the 15 rules (or n/a with a reason, such as plan before the file); the tool answers one JSON shape with ok, issues and next, exit codes 0, 1, 2, a schema command, dry runs for add, remove and tag, a strict parser, paths kept inside the data folder, writes all or nothing; every command a refusal or a next step names runs as it stands; tests per rule; a shipped agent skill; a fresh probe per rule in the hand-over table.",
       "files": []
     }
   ]
