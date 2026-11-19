@@ -25,8 +25,16 @@ since a skill name holds no `/`. A skill reads only files inside its own folder.
 ## Development
 
 ```sh
+pnpm test                                  # links, skill folders and flow format, no model call
+node --test tests/api/flow.api.spec.ts     # one test file
+pnpm run typecheck
 pnpm run format:check
 ```
+
+The tests read every skill folder two levels down, such as `adx/cli/`. They check that its links
+and its backticked `./` and `../` paths resolve inside the folder, that it holds only `SKILL.md`,
+`README.md` and the `references/` its `SKILL.md` names, and that its flow table follows the format
+of [agent-skill.md](adx/cli/references/agent-skill.md).
 
 The evals of a skill, in its `evals/` folder, run by hand with a model and never in CI, since CI
 makes no model call. Run them once after a change to `SKILL.md` or its references, and say in the
@@ -34,9 +42,11 @@ pull request what they showed.
 
 ## Before you open a pull request
 
-Make sure this passes:
+Make sure these pass:
 
 ```sh
+pnpm test
+pnpm run typecheck
 pnpm run format:check
 ```
 
