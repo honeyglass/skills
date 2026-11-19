@@ -24,6 +24,12 @@
       "prompt": "Build me a CLI in TypeScript that manages a list of bookmarks in a JSON file (add, remove, list, tag). It will mostly be driven by Claude, so it should be agent-friendly from day one.",
       "expected_output": "Mode build. A design line for every one of the 15 rules (or n/a with a reason, such as plan before the file); the tool answers one JSON shape with ok, issues and next, exit codes 0, 1, 2, a schema command, dry runs for add, remove and tag, a strict parser, paths kept inside the data folder, writes all or nothing; every command a refusal or a next step names runs as it stands; tests per rule; a shipped agent skill; a fresh probe per rule in the hand-over table.",
       "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "Can you review our deploy script and the agent skill that drives it? They are in evals/files/deploy/ (deploy.sh and deploy-skill.md). Our agent sometimes deploys to production when we meant staging. Check both against the Agent DX rules, and don't change anything.",
+      "expected_output": "Mode review. Neither file changes, and nothing runs that could deploy: the script runs only in a scratch folder, or its verdicts are marked 'code only'. A verdict table with all 15 rules, each with evidence from a run or a file and line; nearly every rule is missing or partly, and rule 1 may be n/a since the script takes two plain values. The gaps name what the code does: the env defaults to staging and any env that starts with 'prod' becomes production (nothing passes silently, options that list), app.js and app.css are copied before the missing version fails (all or nothing, checks in layers), 'something went wrong' has no code, path or hint, every failure exits 1, there is no JSON output, no schema, no dry run and no plan before the deploy. Rule 6 is partly or missing: deploy-skill.md says how to run the script, but has no answer table by exit code or kind, retries 'until it passes' with no bound, and never stops to ask the person, not even before a deploy to production. The version rule ('higher than the last one') stands only in the agent skill and is named as a gap of rule 7: the check belongs in the tool. The strong form of rule 6 is checked with the items F1 to F12 of references/agent-skill.md: no numbered states, no transition table, no bounded back edge, no STOP; each no is named as a next step. The gaps are ordered by harm: the silent ones (the guessed env, the half deploy) first.",
+      "files": ["evals/files/deploy/deploy.sh", "evals/files/deploy/deploy-skill.md"]
     }
   ]
 }
