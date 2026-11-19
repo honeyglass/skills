@@ -9,7 +9,15 @@
  */
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
@@ -81,6 +89,55 @@ test('tasks-cli answers its schema, refuses a path out of its folder, and writes
   const dry = run('node', [TASKS, 'add', '--title', 'Buy', '--dry-run', '--dir', work], work);
   assert.equal(JSON.parse(dry.out).result.written, false);
   assert.deepEqual([readdirSync(parent), readdirSync(work)], [['work'], []]);
+});
+
+test('tasks-cli refuses a blank or invisible title and a date that names no day', () => {
+  const { work } = scratch();
+  const inputs = [
+    ['--title', '   '],
+    ['--title', 'aㅤb'],
+    ['--title', 'x', '--due', '2026-13-45'],
+  ];
+  const answers = inputs.map(input => run('node', [TASKS, 'add', ...input, '--dir', work], work));
+  assert.deepEqual(
+    answers.map(answer => [answer.code, JSON.parse(answer.out).issues[0].code]),
+    [
+      [1, 'BAD_FORMAT'],
+      [1, 'BAD_FORMAT'],
+      [1, 'BAD_FORMAT'],
+    ],
+  );
+  assert.deepEqual(readdirSync(work), []);
+});
+
+test('tasks-cli asks the person about a broken entry and an id beyond its pattern', () => {
+  const broken = scratch().work;
+  const full = scratch().work;
+  const last = '{"tasks":[{"id":"t999999","title":"x","priority":"normal","status":"open"}]}';
+  writeFileSync(join(broken, 'tasks.json'), '{"tasks":[null]}');
+  writeFileSync(join(full, 'tasks.json'), last);
+  const listed = run('node', [TASKS, 'list', '--dir', broken], broken);
+  const added = run('node', [TASKS, 'add', '--title', 'y', '--dir', full], full);
+  assert.deepEqual(
+    [listed, added].map(answer => [answer.code, JSON.parse(answer.out).kind]),
+    [
+      [1, 'ask'],
+      [1, 'ask'],
+    ],
+  );
+  assert.equal(readFileSync(join(full, 'tasks.json'), 'utf8'), last);
+});
+
+test('tasks-cli names an export step that runs once tasks.md exists', () => {
+  const { work } = scratch();
+  run('node', [TASKS, 'add', '--title', 'one', '--dir', work], work);
+  run('node', [TASKS, 'export', '--file', 'tasks.md', '--dir', work], work);
+  const next: { command: string }[] = JSON.parse(
+    run('node', [TASKS, 'list', '--dir', work], work).out,
+  ).next;
+  const exported = next.find(step => step.command.includes(' export '));
+  assert.equal(exported?.command.endsWith('--file tasks.md --replace --dry-run'), true);
+  assert.equal(run('sh', ['-c', exported?.command ?? ''], work).code, 0);
 });
 
 test('tasks-cli exits 2 with kind bug when a built-in breaks, as its header shows', () => {

@@ -19,18 +19,23 @@ const STORE = 'tasks.json';
 const TASK_KEYS = ['id', 'title', 'priority', 'due', 'status'];
 const OUTPUTS = ['json', 'text'];
 const SWITCHES = ['--dry-run', '--replace'];
-const ASK = ['DATA_INVALID', 'NOT_A_FILE', 'STORE_TOO_LARGE', 'TOO_MANY_TASKS']; // only the person can solve these
+const ASK = ['DATA_INVALID', 'NOT_A_FILE', 'STORE_TOO_LARGE', 'TOO_MANY_TASKS', 'NO_ID_LEFT']; // only the person can solve these
 const RETRY = ['EBUSY', 'EAGAIN']; // a later call may pass; any other system error goes to the person
 
 /** Every input field, its rule and its hint; the checks and the schema command read this table. */
 const FIELDS = {
   id: { pattern: /^t[0-9]{1,6}$/, about: 'a task id such as t1' },
+  // A title shows at least one character; one that renders as nothing, such as U+3164, is refused.
   title: {
-    pattern: /^[^\p{Cc}\p{Cf}\p{Zl}\p{Zp}]{1,120}$/u,
-    about: 'one line, 1 to 120 characters',
+    pattern: /^(?=.*\S)[^\p{Cc}\p{Cf}\p{Zl}\p{Zp}\p{Default_Ignorable_Code_Point}]{1,120}$/u,
+    about: 'one line of 1 to 120 characters, not only spaces',
   },
   priority: { values: ['low', 'normal', 'high'] },
-  due: { pattern: /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/, about: 'a date such as 2026-12-31' },
+  due: {
+    pattern: /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/,
+    valid: isCalendarDate,
+    about: 'a date such as 2026-12-31',
+  },
   status: { values: ['open', 'done'] },
   file: { pattern: /^[a-z0-9][a-z0-9_-]{0,40}\.md$/, about: 'a file name such as tasks.md' },
   command: { values: ['add', 'list', 'done', 'export', 'schema'] },
@@ -91,6 +96,10 @@ const TEXTS = {
   UNKNOWN_ID: id => [`No task has the id ${id}`, 'Use an id the command lists'],
   ALREADY_DONE: id => [`${id} is already done`, 'Use an id the command lists'],
   TOO_MANY_TASKS: () => [`The list holds ${MAX_TASKS} tasks`, 'Ask the person which tasks to drop'],
+  NO_ID_LEFT: last => [
+    `No task id is left after ${last}`,
+    'Ask the person to repair the ids in tasks.json',
+  ],
   FILE_EXISTS: f => [`${f} exists`, 'Choose another name, or add --replace to write over it'],
   TARGET_IS_FOLDER: f => [`A folder stands at ${f}`, 'Choose another file name'],
   NOT_A_FILE: f => [`${f} is not a file`, `Ask the person to move what stands at ${f}`],
@@ -171,7 +180,10 @@ function add(call) {
   const store = readStore(call.dir);
   if (store.tasks.length >= MAX_TASKS)
     throw refuse('TOO_MANY_TASKS', 'tasks', command(call, 'list'));
-  const id = `t${Math.max(0, ...store.tasks.map(task => Number(task.id.slice(1)))) + 1}`;
+  const last = Math.max(0, ...store.tasks.map(task => Number(task.id.slice(1))));
+  const id = `t${last + 1}`;
+  // The new id passes the same check as a stored one, or the next read would refuse the store.
+  if (fieldIssue('id', id) !== null) throw refuse('NO_ID_LEFT', 'id', '', `t${last}`);
   const { title, priority = 'normal', due } = call.input;
   const task = { id, title, priority, ...(due && { due }), status: 'open' };
   store.tasks.push(task);
@@ -245,11 +257,12 @@ function addStep(call) {
   ]);
 }
 
+// Once tasks.md exists, the step names the form that passes, and the person decides the replace.
 function exportStep(call) {
-  return step(
-    'shows the plan of tasks.md',
-    command(call, 'export', ['--file', 'tasks.md', '--dry-run']),
-  );
+  const exists = lstatOrNull(path.join(call.dir, 'tasks.md'), 'tasks.md') !== null;
+  const args = ['--file', 'tasks.md', ...(exists ? ['--replace'] : []), '--dry-run'];
+  const does = exists ? 'shows the plan of replacing tasks.md' : 'shows the plan of tasks.md';
+  return step(does, command(call, 'export', args));
 }
 
 /** Reads every argument leniently, then checks the whole call, so one answer names every mistake. */
@@ -403,12 +416,19 @@ function checkFields(call) {
 
 /** The one check of a field value, for the input and for every stored task alike. */
 function fieldIssue(key, value, lists = '') {
-  const { values, pattern } = FIELDS[key];
+  const { values, pattern, valid } = FIELDS[key];
   if (typeof value !== 'string') return issue('WRONG_TYPE', key, '', [key, value]);
   if (values && values.includes(value) === false) return issue('NOT_ALLOWED', key, lists, value);
   if (pattern && pattern.test(value) === false)
     return issue('BAD_FORMAT', key, lists, [key, value]);
+  if (valid && valid(value) === false) return issue('BAD_FORMAT', key, lists, [key, value]);
   return null;
+}
+
+/** A date such as 2026-02-30 has the shape but names no day, so it goes through the calendar. */
+function isCalendarDate(value) {
+  const date = new Date(`${value}T00:00:00Z`);
+  return Number.isNaN(date.getTime()) === false && date.toISOString().slice(0, 10) === value;
 }
 
 function about(key) {
@@ -441,8 +461,10 @@ function checkStore(text) {
   }
   if (Array.isArray(data?.tasks) === false) throw refuse('DATA_INVALID', STORE, '', 'tasks');
   for (const [i, task] of data.tasks.entries()) {
-    const unknown = Object.keys(task ?? {}).find(key => TASK_KEYS.includes(key) === false);
-    const given = TASK_KEYS.filter(key => key !== 'due' || task?.due !== undefined);
+    const isObject = typeof task === 'object' && task !== null && Array.isArray(task) === false;
+    if (isObject === false) throw refuse('DATA_INVALID', STORE, '', `tasks[${i}]`);
+    const unknown = Object.keys(task).find(key => TASK_KEYS.includes(key) === false);
+    const given = TASK_KEYS.filter(key => key !== 'due' || task.due !== undefined);
     const bad = unknown ?? given.find(key => fieldIssue(key, task[key]) !== null);
     if (bad !== undefined) throw refuse('DATA_INVALID', STORE, '', `tasks[${i}].${bad}`);
   }

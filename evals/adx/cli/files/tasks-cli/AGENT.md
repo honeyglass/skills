@@ -44,6 +44,7 @@ Each issue has 'code', 'path', 'message', 'hint' and, where one helps, a 'comman
 
 ## When to stop and ask the person
 
-- Every answer of kind 'ask': a broken or linked tasks.json, a folder without the right to write, a full list.
+- Every answer of kind 'ask': a broken or linked tasks.json, a folder without the right to write, a full list,
+  or no task id left.
 - Before 'export --replace': it writes over a file the person may want to keep.
 - When the person's words fit more than one task, show the candidates and let them choose.
