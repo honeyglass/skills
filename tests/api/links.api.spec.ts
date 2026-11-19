@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { test } from 'node:test';
 import { markdownFiles, ROOT, skillFolders } from '../utils/files.ts';
 import { linkProblems } from '../utils/links.ts';
+import { pageOf } from '../utils/markdown.ts';
 
 const read = (path: string) => readFileSync(path, 'utf8');
 
@@ -50,10 +51,23 @@ test('a missing file, a missing heading and a path out of the skill are each rep
   );
 });
 
-test('a link inside HTML is refused, while HTML without a link reads as it is', () => {
+test('a link inside HTML resolves like any link, and one without quotes is refused', () => {
   const path = join(ROOT, 'sample.md');
+  const icon = '<picture><source srcset="./LICENSE 2x"><img src="./README.md" alt=""></picture>\n';
   assert.deepEqual(linkProblems(path, '<div align="center">\n\n[ok](./README.md)\n\n</div>\n'), []);
-  assert.deepEqual(linkProblems(path, '<a href="./gone.md">gone</a>\n'), [
-    `${path}: holds a link in HTML, which these tests cannot read`,
+  assert.deepEqual(linkProblems(path, icon), []);
+  assert.deepEqual(
+    linkProblems(path, '<a href="./gone.md">gone</a>\n').map(problem =>
+      problem.replace(/^.*: /, ''),
+    ),
+    ['./gone.md leads to no file'],
+  );
+  assert.deepEqual(linkProblems(path, '<img src=README.md alt=x>\n'), [
+    `${path}: holds a link in HTML without quotes, which these tests cannot read`,
   ]);
+});
+
+test('a heading that opens with an icon gets the anchor GitHub gives it, with a leading dash', () => {
+  const { slugs } = pageOf('## <img src="./icon.svg" alt=""> Quick start\n');
+  assert.deepEqual([...slugs], ['-quick-start']);
 });

@@ -24,7 +24,8 @@ const RELATIVE_PATH = /^\.\.?\//;
  */
 export function linkProblems(path: string, text: string, skill?: string) {
   const page = pageOf(text);
-  if (page.htmlLinks) return [`${path}: holds a link in HTML, which these tests cannot read`];
+  if (page.unquotedHtmlLinks)
+    return [`${path}: holds a link in HTML without quotes, which these tests cannot read`];
   const links = page.links.filter(link => EXTERNAL.test(link.destination) === false);
   // A code span outside a skill is often a command, such as './deploy.sh <env>', not a path.
   const codes = skill === undefined ? [] : page.codes;

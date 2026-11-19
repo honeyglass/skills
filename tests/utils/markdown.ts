@@ -4,9 +4,9 @@
  * Page, pageOf: the headings, links, code spans and tables of a file, and its anchors.
  * frontmatterOf: the lines between the two '---' fences at the top of a file.
  *
- * The only file that imports micromark. A link in an HTML attribute is invisible to it, so a page
- * tells whether its HTML holds one, and the caller refuses such a page instead of trusting a
- * partial read. HTML without a link, such as a centered block or a comment, reads as it is.
+ * The only file that imports micromark. A link in an HTML attribute is invisible to it, so the
+ * page reads href, src and srcset itself when their value stands in quotes; a value without quotes
+ * has no end this file can trust, so the page tells of it and the caller refuses the page.
  *
  * @example const { links, tables } = pageOf(readFileSync(path, 'utf8'));
  */
@@ -23,17 +23,18 @@ export type Page = {
   codes: { text: string; line: number }[];
   tables: Table[];
   slugs: Set<string>;
-  htmlLinks: boolean;
+  unquotedHtmlLinks: boolean;
 };
 
 type Event = ReturnType<typeof postprocess>[number];
 type Token = Event[1];
 type Block = { token: Token; children: Token[] };
+type HtmlLink = { destination: string | undefined; line: number };
 
 const DESTINATIONS = new Set(['resourceDestinationString', 'definitionDestinationString']);
 const HTML = new Set(['htmlFlow', 'htmlText']);
-// The attributes of HTML that point to a file or a page.
-const HTML_LINK = /\b(href|src|srcset)\s*=/i;
+// The attributes of HTML that point to a file or a page, with a value in quotes or without.
+const HTML_LINK = /\b(href|src|srcset)\s*=\s*(?:"([^"]*)"|'([^']*)'|(?=[^\s"'>]))/gi;
 const CELLS = new Set(['tableHeader', 'tableData']);
 const LINE_ENDINGS = new Set(['lineEnding', 'lineEndingBlank']);
 const FENCE = '---';
@@ -47,11 +48,19 @@ export function pageOf(file: string): Page {
   const events = eventsOf(text);
   const tokens = events.flatMap(([kind, token]) => (kind === 'enter' ? [token] : []));
   const headings = blocksOf(events).flatMap(block => headingOf(block, text));
+  const html = tokens
+    .filter(token => HTML.has(token.type))
+    .flatMap(token => htmlLinksOf(text, token));
   return {
     headings,
-    links: tokens
-      .filter(token => DESTINATIONS.has(token.type))
-      .map(token => ({ destination: sliceOf(text, token), line: token.start.line })),
+    links: [
+      ...tokens
+        .filter(token => DESTINATIONS.has(token.type))
+        .map(token => ({ destination: sliceOf(text, token), line: token.start.line })),
+      ...html.flatMap(({ destination, line }) =>
+        destination === undefined ? [] : [{ destination, line }],
+      ),
+    ].sort((a, b) => a.line - b.line),
     codes: tokens
       .filter(token => token.type === 'codeText')
       .map(token => ({
@@ -60,8 +69,21 @@ export function pageOf(file: string): Page {
       })),
     tables: tablesOf(events, text),
     slugs: slugsOf(headings.map(heading => heading.text)),
-    htmlLinks: tokens.some(token => HTML.has(token.type) && HTML_LINK.test(sliceOf(text, token))),
+    unquotedHtmlLinks: html.some(link => link.destination === undefined),
   };
+}
+
+// Each URL of an attribute; a srcset lists one or more, each before its optional size, such as '2x'.
+// A value without quotes gives an undefined destination.
+function htmlLinksOf(text: string, token: Token): HtmlLink[] {
+  const html = sliceOf(text, token);
+  return [...html.matchAll(HTML_LINK)].flatMap<HtmlLink>(match => {
+    const line = token.start.line + (html.slice(0, match.index).match(/\n/g)?.length ?? 0);
+    const value = match[2] ?? match[3];
+    if (value === undefined) return [{ destination: undefined, line }];
+    const urls = match[1]?.toLowerCase() === 'srcset' ? value.split(',') : [value];
+    return urls.map(url => ({ destination: url.trim().split(/\s+/)[0] ?? '', line }));
+  });
 }
 
 /**
@@ -115,7 +137,8 @@ function headingOf(block: Block, text: string) {
     .filter(token => token.type === 'data' || token.type === 'codeTextData')
     .map(token => sliceOf(text, token))
     .join('')
-    .trim();
+    // An icon before the words leaves their leading space, and GitHub's anchor keeps it as '-'.
+    .trimEnd();
   if (block.token.type === 'atxHeading' && atx !== undefined)
     return [{ depth: atx.end.offset - atx.start.offset, text: words, line }];
   if (block.token.type === 'setextHeading' && underline !== undefined)
