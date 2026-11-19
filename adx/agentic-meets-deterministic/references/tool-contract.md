@@ -26,6 +26,10 @@ https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/
 - Answer the accepted shape at runtime, for example with a 'schema' command.
 - An option given without a value lists the values it accepts.
 - Keep paths inside the folders the tool owns: an allow-list of folders, everything else refused.
+- Find a stored thing by its name among the things that exist; never build a path from a name the agent wrote.
+- Answer large data in two steps: an outline first, then one part in full by its id.
+  The agent reads the source only through these calls, so the rest stays out of its context.
+- Text the tool reads from outside, such as a web page, comes back as data: one bounded text, with characters that do not show removed.
 
 ## Checks in layers
 
@@ -40,11 +44,21 @@ https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/
 A later layer runs only when the earlier one passed, because its checks need a valid shape.
 One answer lists every issue of the failing layer, so the agent fixes them in one round.
 
+- The arguments of the call are a layer before the shape, and their mistakes come back together too.
+- The call that stores an input runs the same checks as the call that plans the result.
+  One function is the gate, so a refused input is never stored and no call reads unchecked data.
+- A check of the rules layer for every derived version: the version holds only what its source holds (see `./split.md`).
+
 ## All or nothing
 
 **A refused call changes nothing.**
 Write to a temporary file and rename it at the end, or use a transaction.
 A half-written file makes the next call fail for a reason the agent cannot see.
+
+- A call that writes several files writes all temporary files first, then moves them in.
+- Where the last step cannot be undone, the refusal says in a field such as 'state' what is already written.
+- A call that replaces stored data needs a flag such as '--replace', and answers what it adds, changes and removes.
+  The skill passes the flag only when the person asked to replace, and the agent reads what was removed.
 
 ## Refusals
 
@@ -54,6 +68,7 @@ A half-written file makes the next call fail for a reason the agent cannot see.
 {
   "ok": false,
   "kind": "fix",
+  "state": "Nothing was written.",
   "issues": [
     {
       "code": "UNKNOWN_SUPPLIER",
@@ -73,6 +88,10 @@ A half-written file makes the next call fail for a reason the agent cannot see.
 | 'message' | the problem in words for a person |
 | 'hint' | what to change |
 | 'command' | an optional call that lists the valid values |
+| 'state' | on the refusal: what the failed call left, such as 'Nothing was written' |
+
+A 'command' runs as it stands: it carries the folder and the names of the refused call, with every value quoted for the shell.
+A hint that says 'run the command' without a 'command' leaves the agent to guess the call.
 
 The 'kind' tells the agent its next move:
 
@@ -85,6 +104,11 @@ The 'kind' tells the agent its next move:
 
 A 'retry' needs care when the call has an effect.
 Before the next try, the tool must answer whether the first try took effect, so nothing runs twice.
+The 'state' of the refusal is the place for that answer.
+
+The tool decides the kind in one place, from short lists of codes for 'ask' and 'retry'; every other code is 'fix'.
+A failure nobody listed, such as an unknown error of the system, is 'ask': a case nobody planned goes to the person.
+A missing program is 'ask' with the install hint; the agent passes the hint on and installs nothing.
 
 ## Exit codes
 
@@ -98,6 +122,8 @@ The agent then knows the next step from one number, before it reads the answer.
 
 - An unknown command, option, field or value is refused.
 - A required value has no silent default.
+  A default applies only when exactly one candidate exists; with several, the tool refuses and lists them.
+- Two inputs that name different things, such as a version and another source than its own, are refused.
 - A group of commands without an action lists its actions.
 
 A guess turns a typo into a wrong result that looks right.
@@ -107,6 +133,10 @@ A guess turns a typo into a wrong result that looks right.
 **A success names the commands that can follow, and what each one still needs.**
 The agent then finds its way without a manual.
 A dry run, such as a '--dry-run' option, lets the agent see what a call would do before it does it.
+
+- The tool only names a step and never runs one. The flow of the skill decides the move, not the tool.
+- A step without a command is for the person, such as an upload by hand.
+- A named command carries the folder and the names of the call, so it runs as it stands.
 
 ## Output for two readers
 
@@ -122,6 +152,12 @@ Two common answers:
 | :--- | :--- |
 | a thin wrapper that adds the missing check and the refusal format | more code to keep, but the flow stays fully checked |
 | an approval step where the person checks before the call | no code, but the person must read every call |
+
+## The contract and the skill stay in step
+
+The skill names commands, options and refusal codes of the tool.
+A test fails when the skill names one the tool lacks, or when a refusal code the tool can answer has no row in the skill.
+Without it, the skill drifts with every change of the tool, and the agent follows a manual that is no longer true.
 
 ## In a review
 

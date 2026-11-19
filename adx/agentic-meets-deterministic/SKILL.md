@@ -110,6 +110,8 @@ Read `./references/split.md` before the first split.
 - **Person:** only the person knows it or may decide it, such as money, sending or deleting.
 - A step that needs judgment and a rule splits in two: the agent proposes, the tool checks.
   Every agent step that writes or sends something ends in such a tool step.
+- A version the agent derives from a source, such as a summary or a tailored copy, may only select from that source.
+  The tool checks it wherever the values form a closed set; adding to the source is the person's step.
 - In a review, take the split the workflow has now and mark each step whose owner is wrong.
 
 **Exit:** a split table with the columns Step, Owner and Why.
@@ -121,7 +123,7 @@ Every step has one owner, and every agent step that writes or sends ends in a to
 Read `./references/tool-contract.md` before the first contract.
 
 - The checks run in layers (shape, then rules, then limits), and a refused call changes nothing.
-- A refusal says what is wrong, where, what to change, and which call lists the valid values.
+- A refusal says what is wrong, where, what to change, which call lists the valid values, and what the failed call left.
   Its kind tells the agent the next move: fix the input, ask the person, retry, or stop.
 - The tool never guesses: an unknown command, option, field or value is refused.
 - A step that no rule can check goes back to 1 Split; the step belongs to the agent or the person.
@@ -142,8 +144,10 @@ Read `./references/flow.md` before the first table.
 - One transition table with the columns From, To and When stands before the first state.
 - A refusal leads back to the state that made the input, as a marked back edge bounded at 3.
   Reaching the bound is a STOP.
+- Every state that calls the tool has a row for a refusal of that call.
 - Every case only the person may decide has a STOP row.
 - Each state names its outcome at its exit, not the way to get there.
+- The last state before 'done' hands the result to the person to read, with every change and derived value named.
 
 In a review, write the flow the skill has now; a move the agent can make that no row covers is a finding.
 

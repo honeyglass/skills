@@ -22,6 +22,7 @@ In a review, a finding goes into the result with what can go wrong and the chang
 | S3 | Does every rule that gives one answer per input sit in the tool, not only in the prompt? |
 | S4 | Does every step that sends, pays, deletes or states a fact about the person belong to the person or wait for the person's approval? |
 | S5 | Does every harm named in 0 Scope have a step that prevents it? |
+| S6 | Does the tool check that a version the agent derives holds only what its source holds, in every field with a closed set of values? |
 
 ## Tool contracts (owned by 2 Tool)
 
@@ -35,6 +36,8 @@ In a review, a finding goes into the result with what can go wrong and the chang
 | T6 | Can the agent learn the accepted input from the tool itself, such as a schema command? |
 | T7 | Does a call with an effect tell, before a retry, whether the first try took effect? |
 | T8 | Do the exit codes say success, refusal and bug apart? |
+| T9 | Does a refusal say what the failed call left, and does every command it names run as it stands? |
+| T10 | Does a call that replaces stored data need a flag, and answer what it adds, changes and removes? |
 
 ## Flow (owned by 3 Flow)
 
@@ -49,5 +52,8 @@ In a review, a finding goes into the result with what can go wrong and the chang
 | F7 | Does every step the agent can take match a row of the table? |
 | F8 | Is STOP its own state, which asks the person one question and continues only along the answer? |
 | F9 | Does every refusal of kind retry return to its own state as a marked, bounded back edge? |
+| F10 | Does every state that calls the tool have a row for a refusal of that call, in the state where the call is made? |
+| F11 | Does the last state hand the result to the person to read, with every change and every derived value named? |
+| F12 | Does every command, option and refusal code the skill names exist in the tool? |
 
 Then return to state 4 Check in `../SKILL.md`.
