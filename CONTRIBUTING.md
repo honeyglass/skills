@@ -29,6 +29,7 @@ pnpm test                                  # links, skill folders and flow forma
 node --test tests/api/flow.api.spec.ts     # one test file
 pnpm run typecheck
 pnpm run format:check
+sh tests/e2e/install.e2e.sh                # installs each skill through the skills CLI
 ```
 
 The tests read every skill folder two levels down, such as `adx/cli/`. They check that its links

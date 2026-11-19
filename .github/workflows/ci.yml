@@ -63,3 +63,15 @@ jobs:
       - run: pnpm run --if-present lint
       - run: pnpm run --if-present typecheck
       - run: pnpm run --if-present test
+
+  # Each skill installed as a user installs it, through the skills CLI, in an empty home folder:
+  # the CLI finds it and copies only the skill folder. The supply check sets up Node 24 and pnpm.
+  skill:
+    needs: [checks]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: honeyglass/actions/supply-check@d775cff14274bc10b5efcf9ad1826455f1ecde18
+      - run: sh tests/e2e/install.e2e.sh
