@@ -7,6 +7,12 @@ that an agent drives, including the agent skill the CLI ships.
 This README is for people. Claude Code reads [SKILL.md](SKILL.md) and the files in
 [references/](references/).
 
+## Install
+
+```bash
+npx skills add https://github.com/honeyglass/skills --skill adx-cli
+```
+
 ## Agentic meets deterministic
 
 An agent alone can be wrong without noticing. A tool alone cannot read free text, such as an
@@ -94,3 +100,7 @@ commits nothing unless you ask.
 | [references/rules.md](references/rules.md) | the 15 rules and their probes |
 | [references/design.md](references/design.md) | the shapes that close several rules at once |
 | [references/agent-skill.md](references/agent-skill.md) | how to write the agent skill as a state machine |
+
+---
+
+[← honeyglass skills](https://github.com/honeyglass/skills)
