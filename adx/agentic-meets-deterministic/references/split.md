@@ -56,8 +56,7 @@ The agent's typical mistake is to add what the task asks for and the source does
 - Name the cause, then check every field the cause covers.
   A check on one list leaves the same mistake open in the list next to it.
 
-oriko, a CV tool, learned this from a run: a version listed a skill the master CV never named, and the tool built it.
-Its check now refuses such an item.
+Example: a tailored copy lists a skill the source never names; the tool refuses the item and names it.
 
 ## From free text to a fixed value
 

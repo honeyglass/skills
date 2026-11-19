@@ -28,7 +28,7 @@ In a review, a finding goes into the result with what can go wrong and the chang
 
 | Item | Question |
 | :--- | :--- |
-| T1 | Does every command check shape, then rules, then limits, and list every issue of a layer at once? |
+| T1 | Does every command check arguments, then shape, then meaning, then the costly checks, and list every issue of a layer at once? |
 | T2 | Does a refused call change nothing? |
 | T3 | Does every refusal carry a code, a path, a message and a hint, and a command where one lists the valid values? |
 | T4 | Does every refusal carry a kind: fix, ask, retry or bug? |
@@ -55,5 +55,6 @@ In a review, a finding goes into the result with what can go wrong and the chang
 | F10 | Does every state that calls the tool have a row for a refusal of that call, in the state where the call is made? |
 | F11 | Does the last state hand the result to the person to read, with every change and every derived value named? |
 | F12 | Does every command, option and refusal code the skill names exist in the tool? |
+| F13 | Is every When cell at most 60 characters, with no angle brackets and no double quotes? |
 
 Then return to state 4 Check in `../SKILL.md`.

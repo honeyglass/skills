@@ -38,7 +38,7 @@ A move missing from the table is a mistake, not an interpretation.
 
 Write each When cell so the agent can check the condition: a tool answer, a file that exists,
 a person's answer.
-Keep a When cell short, about 60 characters, with no angle brackets and no double quotes.
+Keep a When cell at most 60 characters, with no angle brackets and no double quotes.
 A value in a When cell stands in single quotes.
 
 ## Back edges and bounds
@@ -53,7 +53,8 @@ A value in a When cell stands in single quotes.
 - Mark the row as '(**back edge**, bound 3)' in the When cell: the run takes it at most three times.
 - Put the back edge where the refusal arises. When the call that stores the input also checks it,
   the refusal comes in the state that made the input, and the back edge is a row from that state to itself.
-- A change the person asks for after the result is a back edge too, with its own bound.
+- A change the person asks for after the result is a back edge with its own bound,
+  or starts a new run at the first state with the result as input.
 - Every state that calls the tool has a row for a refusal of that call. A state with only its success row hides a loop.
 
 ## STOP
@@ -69,7 +70,8 @@ Typical STOP rows:
 - the tool, or a program the tool needs, is not installed: the person installs it, and the agent runs no installer
 - stored data would be replaced and the person did not ask for it
 
-The STOP section says: halt, report what happened, ask one question, and continue only along the answer.
+The STOP section says: halt, report what happened, ask one question, and continue only along the answer:
+a row from STOP back to the state it left (marked and bounded), and a row from STOP to done.
 
 ## Inside a state
 

@@ -33,21 +33,22 @@ https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/
 
 ## Checks in layers
 
-**Check shape first, then rules, then limits, and list every issue of a layer at once.**
+**Check the arguments first, then the shape, then the meaning, then the costly checks, and list every issue of a layer at once.**
 
 | Layer | Question | Example |
 | :--- | :--- | :--- |
+| arguments | are the command, its options and its words known, each given once? | an unknown option, a value on a switch |
 | shape | does the input have the right fields and types? | 'net' is a number, 'date' is a date |
-| rules | do the values agree with each other and with the stored data? | gross equals net plus tax, the invoice number is new |
-| limits | does the result fit the bounds? | the text fits on two pages, at most 50 rows |
+| meaning | do the values agree with each other and with the stored data? | gross equals net plus tax, the invoice number is new |
+| costly checks | does the result fit the bounds? | the text fits on two pages, at most 50 rows |
 
 A later layer runs only when the earlier one passed, because its checks need a valid shape.
 One answer lists every issue of the failing layer, so the agent fixes them in one round.
 
-- The arguments of the call are a layer before the shape, and their mistakes come back together too.
+- The mistakes in the arguments of the call come back together too, like the issues of every other layer.
 - The call that stores an input runs the same checks as the call that plans the result.
   One function is the gate, so a refused input is never stored and no call reads unchecked data.
-- A check of the rules layer for every derived version: the version holds only what its source holds (see `./split.md`).
+- A check of the meaning layer for every derived version: the version holds only what its source holds (see `./split.md`).
 
 ## All or nothing
 

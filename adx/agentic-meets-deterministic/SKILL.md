@@ -1,6 +1,6 @@
 ---
 name: agentic-meets-deterministic
-description: Designs or reviews a workflow in which an AI agent works through a deterministic tool such as a CLI. It splits the work into what needs the agent's judgment and what a tool checks by rule (shape, rules, limits, all or nothing, a refusal that says what to change), and writes the agent's skill as a fixed flow, a state machine with a transition table, bounded back edges and a STOP that asks the person. Use it whenever someone builds an agent with a CLI or a tool, wants to make an agent reliable, asks how agentic and deterministic parts fit together, wants to design an agent workflow, wants a skill written as a state machine, or asks for a review of an existing agent skill and its tool, even when none of these words is used.
+description: Designs or reviews a workflow in which an AI agent works through a deterministic tool such as a CLI. It splits the work into what needs the agent's judgment and what a tool checks by rule (arguments, shape, meaning, costly checks, all or nothing, a refusal that says what to change), and writes the agent's skill as a fixed flow, a state machine with a transition table, bounded back edges and a STOP that asks the person. Use it whenever someone builds an agent with a CLI or a tool, wants to make an agent reliable, asks how agentic and deterministic parts fit together, wants to design an agent workflow, wants a skill written as a state machine, or asks for a review of an existing agent skill and its tool, even when none of these words is used. It covers the split, the contract and the flow of a workflow, not a rule-by-rule check of one CLI.
 ---
 
 1. Every move is a row of the transition table; a move outside it is a mistake.
@@ -24,7 +24,7 @@ Put the two together, and each one does what the other cannot.
   The tool refuses what does not fit, writes nothing on a refusal and never guesses.
   Its refusal says where the input is wrong and what to change.
 - **The skill** is the agent's manual, written as a fixed flow: named states and a table of moves.
-  After a refusal the agent goes back to the state that made the input and fixes it, at most three times.
+  After a refusal of kind 'fix' the agent goes back to the state that made the input and fixes it, at most three times.
   Then the agent stops and asks the person.
 
 The agent's mistakes turn into refusals the agent can read and fix.
@@ -73,8 +73,8 @@ The STOP gives the person the last word on what only the person may decide.
 | 1 Split | 2 Tool | every step has one owner: agent, tool or person |
 | 1 Split | STOP | no step can be checked by a rule, or an owner is unclear |
 | 2 Tool | 3 Flow | every tool step has a contract |
-| 2 Tool | 1 Split | a step has no rule to check it (**back edge**, bound 3) |
-| 2 Tool | STOP | no rule after three returns, or a fixed tool lacks a check |
+| 2 Tool | 1 Split | a design step no rule can check (**back edge**, bound 3) |
+| 2 Tool | STOP | a design hits the bound, or a fixed tool lacks a check |
 | 3 Flow | 4 Check | every state, row and STOP of the flow is written |
 | 4 Check | 1 Split | a design finding in the split (**back edge**, bound 3) |
 | 4 Check | 2 Tool | a design finding in a contract (**back edge**, bound 3) |
@@ -82,6 +82,8 @@ The STOP gives the person the last word on what only the person may decide.
 | 4 Check | STOP | a design still has a finding after three returns |
 | 4 Check | 5 Report | every check passes, or a review lists every finding |
 | 5 Report | done | the result is handed over |
+| STOP | the state it left | the answer fits a row of that state (**back edge**, bound 3) |
+| STOP | done | the person ends the run |
 
 The bound of 3 on the rows from 4 Check counts all three rows together.
 
@@ -122,7 +124,7 @@ Every step has one owner, and every agent step that writes or sends ends in a to
 **For every tool step, write the contract: what the tool accepts, checks and answers.**
 Read `./references/tool-contract.md` before the first contract.
 
-- The checks run in layers (shape, then rules, then limits), and a refused call changes nothing.
+- The checks run in layers (arguments, then shape, then meaning, then the costly checks), and a refused call changes nothing.
 - A refusal says what is wrong, where, what to change, which call lists the valid values, and what the failed call left.
   Its kind tells the agent the next move: fix the input, ask the person, retry, or stop.
 - The tool never guesses: an unknown command, option, field or value is refused.
@@ -142,8 +144,8 @@ Read `./references/flow.md` before the first table.
 
 - Every state has a number and a name, used the same way everywhere.
 - One transition table with the columns From, To and When stands before the first state.
-- A refusal leads back to the state that made the input, as a marked back edge bounded at 3.
-  Reaching the bound is a STOP.
+- A refusal of kind 'fix' leads back to the state that made the input, and one of kind 'retry' to its own state,
+  each as a marked back edge bounded at 3. Reaching the bound is a STOP; 'ask' and 'bug' lead to STOP at once.
 - Every state that calls the tool has a row for a refusal of that call.
 - Every case only the person may decide has a STOP row.
 - Each state names its outcome at its exit, not the way to get there.
@@ -182,8 +184,8 @@ In a review, every item passes or has a finding.
 
 - Name the state and the row that led here, and what you found.
 - Ask one question; give the choices, the recommended one first, each with its trade-off.
-- After the answer, go on in the state the answer names, or end the run.
-  A choice that needs a move missing from the table ends this run; a new run starts at 0 Scope.
+- After the answer, go back to the state that led here and leave it along one of its rows, or end the run.
+  A choice no row covers ends this run; a new run starts at 0 Scope.
 
 **Exit:** the person has answered, and the run goes on along that answer or ends.
 
