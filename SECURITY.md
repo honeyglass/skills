@@ -35,7 +35,7 @@ check below from them.
   token stays in `.git/config`, and every later step, including anything a dependency
   runs, can read it and use it.
 - **No secrets.** No job gets a secret. CI needs no Claude token, since it makes no model
-  call: the evals of a skill run by hand, and `CLAUDE_CODE_OAUTH_TOKEN` and
+  call, and `CLAUDE_CODE_OAUTH_TOKEN` and
   `ANTHROPIC_API_KEY` stay out of GitHub, as each is valid for a year or more.
 - **Dependabot moves the pins forward weekly.** A pin nobody updates rots, and a rotten
   pin is an action that no longer gets its fixes.

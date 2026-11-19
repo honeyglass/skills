@@ -8,7 +8,7 @@ Agent skills, one folder per skill, installed through the skills CLI of skills.s
   `adx-cli`, since a skill name holds no `/`. `skills.sh.json` names each family folder, so the
   skills CLI finds the skills there.
 - An install copies the whole skill folder, so it holds only `SKILL.md`, `README.md` and the
-  `references/` its `SKILL.md` names. Evals and their sample tools live in `evals/<family>/<kind>/`.
+  `references/` its `SKILL.md` names.
 - A skill reads only files inside its own folder: no link or path in it leads out of the folder.
 - `tests/` holds the checks; none of it is part of a skill.
 
@@ -21,12 +21,6 @@ Agent skills, one folder per skill, installed through the skills CLI of skills.s
 - `README.md` of a skill is for people; the agent reads `SKILL.md` and `references/`.
 - A skill names no tool, library or file of one machine or one project as a dependency; it may
   name one as an example.
-
-## Evals
-
-The evals run by hand with a model, never in CI, since CI makes no model call. Run them once
-after a change to a `SKILL.md` or its references. The tests check that they name only files that
-exist, and that the sample tools still behave as the expected outputs describe.
 
 ## Checks
 

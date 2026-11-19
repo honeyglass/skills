@@ -94,7 +94,3 @@ commits nothing unless you ask.
 | [references/rules.md](references/rules.md) | the 15 rules and their probes |
 | [references/design.md](references/design.md) | the shapes that close several rules at once |
 | [references/agent-skill.md](references/agent-skill.md) | how to write the agent skill as a state machine |
-
-The test prompts of the skill and their sample CLIs stay in the repository, in
-[evals/adx/cli/](https://github.com/honeyglass/skills/tree/main/evals/adx/cli), so an install copies
-only the files above.

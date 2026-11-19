@@ -11,7 +11,7 @@ WORK=$(mktemp -d)
 trap 'rm -rf "$WORK"' EXIT
 # The skills CLI of skills.sh, pinned to a version at least three days old.
 SKILLS_CLI='skills@1.8.1'
-# What an install of adx-cli must hold, and nothing else: no evals, no tests.
+# What an install of adx-cli must hold, and nothing else: no tests.
 EXPECTED='README.md
 SKILL.md
 references/agent-skill.md

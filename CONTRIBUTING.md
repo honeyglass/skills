@@ -35,13 +35,7 @@ sh tests/e2e/install.e2e.sh                # installs each skill through the ski
 The tests read every skill folder two levels down, such as `adx/cli/`. They check that its links
 and its backticked `./` and `../` paths resolve inside the folder, that it holds only `SKILL.md`,
 `README.md` and the `references/` its `SKILL.md` names, and that its flow table follows the format
-of [agent-skill.md](adx/cli/references/agent-skill.md). They also check that the evals of a skill,
-in `evals/<family>/<kind>/`, name only files that exist, and that the sample tools of the evals
-still behave as the expected outputs describe.
-
-The evals of a skill, in its `evals/` folder, run by hand with a model and never in CI, since CI
-makes no model call. Run them once after a change to `SKILL.md` or its references, and say in the
-pull request what they showed.
+of [agent-skill.md](adx/cli/references/agent-skill.md).
 
 ## Before you open a pull request
 

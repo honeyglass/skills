@@ -1,7 +1,7 @@
 # TODO
 
 Open work on the skills of honeyglass and their package @honeyglass/skills.
-<!-- last item number: 5 -->
+<!-- last item number: 8 -->
 
 ## Next
 
@@ -10,17 +10,11 @@ Open work on the skills of honeyglass and their package @honeyglass/skills.
 - [ ] #1 Publish @honeyglass/skills on npm: drop "private", add version, files ["adx"], repository and publishConfig to package.json, a test that pins the files of the tarball, and a release workflow that publishes from a tag through npm's trusted publishing with id-token: write on that job only and no secret; the first publish waits for the person's word (added 2026-11-19)
       'package.json', '.github/workflows/'
 
-## Evals
-
-- [ ] #4 Run each eval in an empty folder that holds only the files its 'files' list names, not in a copy of the whole repository, so an eval sees neither the tests nor another skill; the run of 2026-11-19 in full copies let the fix eval of notes-cli find tests/api/fixtures.api.spec.ts as a caller (added 2026-11-19)
-      'evals/', 'tests/'
-- [ ] #5 Add one command that prepares every eval of a skill: it builds the folder of #4, prints the prompt and where the expected output stands, and leaves the run and the grading by a model outside CI (added 2026-11-19)
-      after:#4
-      'package.json', 'evals/'
-
 ## adx
 
 - [ ] #2 Settle how adx-cli points to the refusal library of @honeyglass/utils, and to rules a project or the user's agent setup may override, such as error formats or retry bounds, without depending on either: the kinds become an open set with a floor of fix, retry, ask and bug, a project rule that adds a kind or a bound is followed and named in its design line, one that takes away what a probe needs goes to STOP, and the README names @honeyglass/utils as one implementation (added 2026-11-19, from oriko's #18)
       'adx/cli/SKILL.md', 'adx/cli/references/design.md', 'adx/cli/references/rules.md', 'adx/cli/references/agent-skill.md'
 - [ ] #3 Work out how best to build an MCP extension as a wrapper around an ADX tool, such as adx/mcp beside adx/cli; start only once #2 is fully done (added 2026-11-19, from oriko's #19)
       after:#2
+- [ ] #8 Work out a base CLI that adx-cli brings along, which a tool built with the skill extends: it fixes the ADX principles in code, such as the strict parser, one JSON answer, refusals with a kind and exit codes 0, 1 and 2, dry runs and the schema command, so they hold by construction and can be checked deterministically instead of by an agent probing each tool; weigh it against the refusal library of #2 (added 2026-11-19)
+      'package.json', 'adx/'
