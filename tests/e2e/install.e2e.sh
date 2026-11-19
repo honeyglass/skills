@@ -28,9 +28,11 @@ main() {
 }
 
 # The run starts in the temporary folder with its own home, so pnpm's cache and store land there
-# too and the checkout stays as it was.
+# too and the checkout stays as it was. NO_COLOR keeps the output plain: in CI the CLI colours it,
+# and a colour code glued to a skill name hides the name from grep.
 skills() {
-  (cd "$WORK" && HOME="$WORK/home" DISABLE_TELEMETRY=1 DO_NOT_TRACK=1 pnpm dlx "$SKILLS_CLI" "$@")
+  (cd "$WORK" && HOME="$WORK/home" NO_COLOR=1 DISABLE_TELEMETRY=1 DO_NOT_TRACK=1 \
+    pnpm dlx "$SKILLS_CLI" "$@")
 }
 
 fail() {
