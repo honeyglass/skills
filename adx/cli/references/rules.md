@@ -106,6 +106,9 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
   (by exit code or kind), the flow of a typical task, when to stop and ask the person, and how many
   retries come before that.
 - Fails when: the manual names commands, options or error codes the tool no longer has.
+- Strong form: the manual is a state machine, and every item F1 to F12 of `./agent-skill.md` holds:
+  numbered states, a transition table before the first state, back edges bounded at 3, STOP as a state of its own.
+  Read `./agent-skill.md` for these probes.
 - Strong form: a test or a generator keeps the manual in step with the tool.
   A program writes the facts that stand in the code (names, options, codes); a person or an agent writes only the prose.
 

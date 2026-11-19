@@ -1,6 +1,6 @@
 ---
 name: adx-cli
-description: Checks a command-line tool against 15 Agent DX rules that make a CLI easy for an AI agent to drive (JSON in and out, a schema at runtime, safe paths and ids, dry runs, errors with a hint, exit codes 0, 1, 2, a strict parser), reports each rule as met or not with evidence, and builds or changes the tool until the rules hold. Use it whenever the user builds, reviews or fixes a CLI that an agent will drive, mentions Agent DX, or asks why an agent keeps failing with a command-line tool, even when the rules are not named. It checks one CLI and its manual rule by rule, not the design of the workflow around it.
+description: Builds, reviews and fixes a command-line tool that an AI agent drives, including the agent skill the tool ships. It checks the tool against 15 Agent DX rules (JSON in and out, a schema at runtime, safe paths and ids, dry runs, errors with a hint, exit codes 0, 1, 2, a strict parser, an agent skill written as a state machine with bounded retries and a STOP that asks the person), reports each rule as met or not with evidence, and builds or changes the tool and its agent skill until the rules hold. Use it whenever the user builds, reviews or fixes a CLI that an agent will drive, writes or reviews the agent skill of such a tool, mentions Agent DX, or asks why an agent keeps failing with a command-line tool, even when the rules are not named.
 ---
 
 1. The contract: every move is a row of the Flow table; a move missing from it is a bug, not an interpretation.
@@ -14,8 +14,11 @@ DX stands for developer experience: how easy a tool is to use. Agent DX asks the
 An agent cannot click through a menu or guess what a vague error means; the agent acts on what the tool answers.
 A CLI meets the Agent DX rules when every answer tells the agent what happened and what it can do next.
 
-This skill checks a tool against 15 rules, each verdict with evidence.
-When the user asks for it, it builds a new tool or changes an existing one until the rules hold.
+This skill builds, reviews and fixes a CLI for agents, including the agent skill the CLI ships.
+It checks the tool against 15 rules, each verdict with evidence.
+When the user asks for it, it builds a new tool or changes an existing one, its agent skill included, until the rules hold.
+The agent skill (rule 6) tells the agent which command to run when, and when to stop and ask the person;
+`./references/agent-skill.md` says how to write it as a state machine.
 
 The 15 rules, each with its probe, stand in `./references/rules.md`:
 raw JSON input, schema at runtime, JSON when piped, input hardening, dry runs, agent skill,
@@ -35,6 +38,7 @@ hints that run, options that list, next steps, nothing passes silently.
 | gap | a rule in scope with the verdict 'partly' or 'missing' |
 | caller | a script, an agent or a person that already relies on the tool's output |
 | person | in the rules, the human whom an agent driving the tool stops and asks |
+| agent skill | the manual for agents that ships with the tool, such as a SKILL.md (rule 6) |
 | breaking change | a change after which a working call of a caller fails or reads something else |
 | scratch folder | a new, empty temporary folder where the tool may read and write |
 | design line | one planned change: the rule, what the tool will do, the file, and whether it breaks callers |
@@ -74,6 +78,7 @@ hints that run, options that list, next steps, nothing passes silently.
 | 3 Report | 4 Design | the mode is fix and at least one rule in scope is a gap |
 | 4 Design | 5 Change | no design line breaks callers, or the user approved them |
 | 4 Design | STOP | a design line breaks callers without the user's approval |
+| 4 Design | STOP | a gap sits in a tool the user cannot change |
 | 5 Change | 6 Verify | every design line is coded and the project checks pass |
 | 5 Change | STOP | a design line needs a new dependency |
 | 6 Verify | 5 Change | a probe or a check still fails (**back edge**, bound 3) |
@@ -122,6 +127,7 @@ A tool that does not start there goes to STOP: say what failed.
 **Outcome: every rule in scope has a verdict, and every verdict has its evidence.**
 
 Read `./references/rules.md` before the first verdict; it holds each rule and its probe.
+Read `./references/agent-skill.md` before the verdict of rule 6; its items are the probes of the strong form.
 
 - A rule is 'met' only when every command it concerns meets it. Check every command that writes or sends, not only the first.
 - 'partly' names the commands that fail the rule.
@@ -163,12 +169,15 @@ In 'fix' mode with at least one gap, the run goes on to 4 Design; otherwise the 
 **Outcome: one design line for every gap, or for every rule in scope in 'build' mode, each marked breaking or not.**
 
 Read `./references/design.md` before the first design line; it holds the shapes that close several rules at once.
+Read `./references/agent-skill.md` before the design line of rule 6; it holds how the agent skill is written.
 
 - Use the tool's own language, argument parser, validation library and test framework.
 - A design line is breaking when a caller's working call would fail or read something else.
   Examples: piped output turns from text into JSON, an ignored option is now refused, an exit code changes.
 - For each breaking line, offer the user a way to keep the old behavior, such as a flag or a version switch.
 - Present the breaking lines at STOP, one decision per line, with the recommended choice first.
+- A gap in a tool the user cannot change goes to STOP: offer a thin wrapper or an approval step,
+  as `./references/design.md` describes.
 
 ### 5 Change
 
@@ -177,6 +186,7 @@ Read `./references/design.md` before the first design line; it holds the shapes 
 - A test per rule asserts what an agent sees: the output, the exit code, the files before and after.
   `./references/design.md` lists the tests that earn their place.
 - A change for one rule must not undo another rule; the shared shapes in `./references/design.md` keep them apart.
+- The agent skill is written or fixed as `./references/agent-skill.md` describes, until its items F1 to F12 hold.
 - A design line that needs a new dependency goes to STOP: name the dependency and why.
 - Coming back from 6 Verify, change only what the failing probes name.
 

@@ -1,20 +1,21 @@
 ---
 reference:
-  reads-in: 3 Flow
-  before: the first transition table of a run
-  return-to: 3 Flow
+  reads-in: 2 Check, 4 Design, 5 Change, 6 Verify
+  before: the verdict of rule 6, and the first line of an agent skill that is written or fixed
+  return-to: the state that read it
 ---
 
-# Writing the skill as a flow
+# The agent skill as a state machine
 
-Part of state 3 Flow in `../SKILL.md`.
+Part of states 2 Check, 4 Design, 5 Change and 6 Verify in `../SKILL.md`.
 
-**The agent's skill is a state machine: named states, one table of legal moves, and a STOP that
-asks the person.**
-A state machine here means: the run is in exactly one state at a time, and only the rows of the
+**The agent skill is a state machine: named states, one table of legal moves, and a STOP that asks the person.**
+
+The agent skill is the manual for agents that ships with the tool (rule 6).
+A state machine here means: the agent is in exactly one state at a time, and only the rows of the
 table say which state may come next.
 Inside a state the agent is free; between states only the table decides.
-The freedom keeps the skill short; the table keeps every run checkable.
+The freedom keeps the agent skill short; the table keeps every run of the agent checkable.
 
 ## States
 
@@ -32,7 +33,7 @@ A move missing from the table is a mistake, not an interpretation.
 
 | Column | Content |
 | :--- | :--- |
-| From | the state the run is in |
+| From | the state the agent is in |
 | To | the next state, or STOP, or done |
 | When | the condition that makes the row apply, in plain words |
 
@@ -45,12 +46,13 @@ A value in a When cell stands in single quotes.
 
 **A row back to an earlier state, or to the same state, is a back edge: mark it and bound it.**
 
-- After a refusal of kind 'fix', the run goes back to the state that made the input.
-- After a refusal of kind 'retry', the run stays in its state and calls again (**back edge**, bound 3);
+- After a refusal of kind 'fix', the agent goes back to the state that made the input.
+- After a refusal of kind 'retry', the agent stays in its state and calls again (**back edge**, bound 3);
   before the call, a call with an effect asks the tool whether the last try took effect.
-- The bound is usually 3: one round for the clear fix, more for an issue the first fix uncovered.
+- The bound is usually 3: the agent returns at most three times.
+  One round for the clear fix, more for an issue the first fix uncovered.
   After three rounds of fixes the agent is guessing, so a fourth refusal leads to STOP.
-- Mark the row as '(**back edge**, bound 3)' in the When cell: the run takes it at most three times.
+- Mark the row as '(**back edge**, bound 3)' in the When cell.
 - Put the back edge where the refusal arises. When the call that stores the input also checks it,
   the refusal comes in the state that made the input, and the back edge is a row from that state to itself.
 - A change the person asks for after the result is a back edge with its own bound,
@@ -66,12 +68,12 @@ Typical STOP rows:
 - the bound of a back edge is reached
 - an input is missing or unclear
 - the agent would add a fact the person did not give, or raise a limit
-- a step sends, pays or deletes and the person has not approved it
+- a step sends, pays, deploys or deletes and the person has not approved it
 - the tool, or a program the tool needs, is not installed: the person installs it, and the agent runs no installer
 - stored data would be replaced and the person did not ask for it
 
-The STOP section says: halt, report what happened, ask one question, and continue only along the answer:
-a row from STOP back to the state it left (marked and bounded), and a row from STOP to done.
+The STOP section says: halt, report what happened, ask one question, and continue only along the answer.
+STOP has rows out of it: one back to the state it left (marked and bounded), and one to done.
 
 ## Inside a state
 
@@ -129,13 +131,13 @@ Each test says what must stay unchanged, such as the source.
 
 ## The opening lines
 
-A skill of this kind can open with a few short commitments, one per line, before its title:
+An agent skill of this kind can open with a few short commitments, one per line, before its title:
 every move is a row, a state names its outcome, one word per thing, STOP instead of a detour.
 The commitments tell the agent how to read everything after them.
 
-## An example (illustrative: take the states from the workflow at hand, not from this one)
+## An example (illustrative: take the states from the tool at hand, not from this one)
 
-A workflow that books supplier invoices from PDFs into a ledger file through a CLI named 'ledger'.
+An agent skill that books supplier invoices from PDFs into a ledger file through a CLI named 'ledger'.
 
 | From | To | When |
 | :--- | :--- | :--- |
@@ -154,14 +156,39 @@ A workflow that books supplier invoices from PDFs into a ledger file through a C
 | 5 Book | 6 Report | 'ledger add' answers ok |
 | 5 Book | STOP | 'ledger add' refuses |
 | 6 Report | done | the report is given |
+| STOP | the state it left | the answer fits a row of it (**back edge**, bound 3) |
+| STOP | done | the person ends the run |
 
 The agent reads the PDF and fills the fields (judgment).
 'ledger check' tests the shape, the sums, the tax rate and that the invoice number is new (rules).
 The person approves before the entry is written (a step that is hard to undo).
 
+## The probes of the strong form
+
+**Every item is a yes or no question; a no is a next step in the report.**
+Rule 6 in `./rules.md` can be 'met' without these items, so a no alone is not a gap.
+That every command, option and refusal code the agent skill names exists in the tool is part of 'met' already.
+
+| Item | Question |
+| :--- | :--- |
+| F1 | Does every state have a number and a name, used the same way everywhere? |
+| F2 | Is the transition table complete and placed before the first state? |
+| F3 | Does every refusal of kind fix lead back to the state that made the input? |
+| F4 | Is every back edge marked and bounded, with a STOP when the bound is reached? |
+| F5 | Does every refusal of kind ask or bug, and every missing input, lead to STOP? |
+| F6 | Does every state name the outcome at its exit? |
+| F7 | Does every step the agent can take match a row of the table? |
+| F8 | Is STOP its own state, which asks the person one question and continues only along the answer? |
+| F9 | Does every refusal of kind retry return to its own state as a marked, bounded back edge? |
+| F10 | Does every state that calls the tool have a row for a refusal of that call, in the state where the call is made? |
+| F11 | Does the last state hand the result to the person to read, with every change and every derived value named? |
+| F12 | Is every When cell at most 60 characters, with no angle brackets and no double quotes? |
+
 ## In a review
 
-Write the flow the skill has now, even when the skill is plain prose.
-Each step the agent can take that no row covers is a finding, and so is each loop without a bound.
+Write the flow the agent skill has now, even when it is plain prose, and answer F1 to F12 on it.
+A loop without a bound also fails 'met' of rule 6: the manual must say how many retries come before it asks.
+A rule the agent skill states that a program could check, such as 'the version must be higher than the last',
+is a gap of rule 7: the rule belongs in the tool's checks, where the agent cannot skip it.
 
-Then return to state 3 Flow in `../SKILL.md`.
+Then return to the state that sent you here: 2 Check, 4 Design, 5 Change or 6 Verify.

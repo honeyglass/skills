@@ -111,6 +111,25 @@ An agent runs a command the tool names without reading it twice, so the command 
 - When a later rename fails, remove the temporary files and name in 'state' what is already written.
 - A command that replaces stored data needs a flag, and answers what it adds, changes and removes.
 
+## A version may only select from its source (7)
+
+**When the agent derives a version from a source the person owns, the tool checks that the version adds nothing.**
+
+A summary, a tailored copy or a shortened report is a version of a source.
+The agent's typical mistake is to add what the task asks for and the source does not hold.
+
+- Where the source holds a closed list (names, skills, line items), the tool lets the version keep, drop and reorder items.
+  An item the source does not hold is refused, with the item named.
+- Adding the item is a change to the source, and the source belongs to the person: the agent skill stops and asks.
+- Where the version may reword free text, no rule can tell a rewording from a new claim.
+  That part stays with the agent as a prohibition with a test the agent can apply
+  (a verb, a duty or a name that only the outside text uses is a new claim),
+  and with the person, who reads the result at the end.
+- Name the cause, then check every field the cause covers.
+  A check on one list leaves the same mistake open in the list next to it.
+
+Example: a tailored copy lists a skill the source never names; the tool refuses the item and names it.
+
 ## A strict parser (15)
 
 - An unknown command, an unknown option, an extra word or an option of another command is an issue, never ignored.
@@ -122,14 +141,36 @@ An agent runs a command the tool names without reading it twice, so the command 
 
 ## The agent skill (6)
 
-The skill ships with the tool and holds:
+The agent skill ships with the tool and holds:
 
 - when to use the tool, and how to run it
 - a table that maps each answer (exit code and kind) to what the agent does
 - the flow of a typical task, with the points where the agent stops and asks the person
 
-Keep the skill in step with the tool: a test fails when the skill names a command, an option or an error code the tool lacks.
-The facts that stand in the code are written and checked by a program; the agent writes only the prose around them.
+Write the flow as a state machine, as `./agent-skill.md` describes:
+numbered states, a transition table before the first state, back edges bounded at 3, and STOP as a state of its own.
+
+## The contract and the agent skill stay in step (6)
+
+The agent skill names commands, options and refusal codes of the tool.
+A test fails when the agent skill names one the tool lacks, or when a refusal code the tool can answer has no row in the agent skill.
+Without the test, the agent skill drifts with every change of the tool, and the agent follows a manual that is no longer true.
+
+## Facts from the code, prose from the agent (6)
+
+A fact that stands in the code, such as a command, an option or a link between two modules, is written into a doc by a program.
+The agent writes only the sentences, and a check fails when the two drift apart.
+The program hands each gap to the writer as data: the file that lacks a sentence, with its comments.
+
+## A tool the user cannot change
+
+When the tool belongs to someone else, a gap cannot be closed in its code.
+State 4 Design stops and asks the user; two common answers:
+
+| Choice | Trade-off |
+| :--- | :--- |
+| a thin wrapper that adds the missing check and the error shape | more code to keep, but every call stays checked |
+| an approval step in the agent skill, where the person checks each call before it runs | no code, but the person must read every call |
 
 ## Where the errors live
 
