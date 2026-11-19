@@ -1,0 +1,23 @@
+{
+  "skill_name": "agent-dx-rules",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I wrote a small Node CLI for our release notes, it's in TOOL_DIR (entry point bin/notes.js). Our coding agent keeps getting it wrong. Can you review my CLI for agents and tell me which Agent DX rules it meets? Don't change anything yet.",
+      "expected_output": "Mode review. A verdict table with all 15 rules, each verdict met, partly, missing or n/a, each with evidence (a command run in a scratch folder with exit code and output, or a file and line); n/a only with a reason; gaps ordered by harm to an agent; no file of the tool changed.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "make the CLI in TOOL_DIR agent friendly. it prints errors as plain text and exits 1 for everything. careful, our deploy scripts parse its text output when piped, those must keep working",
+      "expected_output": "Mode fix. Check and report first; the design marks switching piped output to JSON as breaking and stops to ask the user, offering a way to keep text output (such as a flag); non-breaking gaps (exit codes 0, 1, 2 only if callers do not rely on exit 1, errors with code, path, message and hint) are designed; nothing is changed before the user answers the breaking question.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "Build me a CLI in TypeScript that manages a list of bookmarks in a JSON file (add, remove, list, tag). It will mostly be driven by Claude, so it should be agent-friendly from day one.",
+      "expected_output": "Mode build. A design line for every one of the 15 rules (or n/a with a reason, such as plan before the file); the tool answers one JSON shape with ok, issues and next, exit codes 0, 1, 2, a schema command, dry runs for add, remove and tag, a strict parser, paths kept inside the data folder, writes all or nothing; tests per rule; a shipped agent skill; a fresh probe per rule in the hand-over table.",
+      "files": []
+    }
+  ]
+}
