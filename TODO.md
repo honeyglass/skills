@@ -1,7 +1,7 @@
 # TODO
 
 Open work on the skills of honeyglass and their package @honeyglass/skills.
-<!-- last item number: 3 -->
+<!-- last item number: 5 -->
 
 ## Next
 
@@ -9,6 +9,14 @@ Open work on the skills of honeyglass and their package @honeyglass/skills.
 
 - [ ] #1 Publish @honeyglass/skills on npm: drop "private", add version, files ["adx"], repository and publishConfig to package.json, a test that pins the files of the tarball, and a release workflow that publishes from a tag through npm's trusted publishing with id-token: write on that job only and no secret; the first publish waits for the person's word (added 2026-11-19)
       'package.json', '.github/workflows/'
+
+## Evals
+
+- [ ] #4 Run each eval in an empty folder that holds only the files its 'files' list names, not in a copy of the whole repository, so an eval sees neither the tests nor another skill; the run of 2026-11-19 in full copies let the fix eval of notes-cli find tests/api/fixtures.api.spec.ts as a caller (added 2026-11-19)
+      'evals/', 'tests/'
+- [ ] #5 Add one command that prepares every eval of a skill: it builds the folder of #4, prints the prompt and where the expected output stands, and leaves the run and the grading by a model outside CI (added 2026-11-19)
+      after:#4
+      'package.json', 'evals/'
 
 ## adx
 
