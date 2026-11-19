@@ -1,6 +1,6 @@
 ---
-name: agent-dx-rules
-description: Checks a command-line tool against 15 Agent DX rules that make a CLI easy for an AI agent to drive (JSON in and out, a schema at runtime, safe paths and ids, dry runs, errors with a hint, exit codes 0, 1, 2, a strict parser), reports each rule as met or not with evidence, and builds or changes the tool until the rules hold. Use it whenever the user builds, reviews or fixes a CLI that an agent will drive, mentions Agent DX, or asks why an agent keeps failing with a command-line tool, even when the rules are not named.
+name: adx-cli
+description: Checks a command-line tool against 15 Agent DX rules that make a CLI easy for an AI agent to drive (JSON in and out, a schema at runtime, safe paths and ids, dry runs, errors with a hint, exit codes 0, 1, 2, a strict parser), reports each rule as met or not with evidence, and builds or changes the tool until the rules hold. Use it whenever the user builds, reviews or fixes a CLI that an agent will drive, mentions Agent DX, or asks why an agent keeps failing with a command-line tool, even when the rules are not named. It checks one CLI and its manual rule by rule, not the design of the workflow around it.
 ---
 
 1. The contract: every move is a row of the Flow table; a move missing from it is a bug, not an interpretation.
@@ -34,6 +34,7 @@ hints that run, options that list, next steps, nothing passes silently.
 | evidence | a command that was run, with its output and exit code, or a file and line of the tool's code |
 | gap | a rule in scope with the verdict 'partly' or 'missing' |
 | caller | a script, an agent or a person that already relies on the tool's output |
+| person | in the rules, the human whom an agent driving the tool stops and asks |
 | breaking change | a change after which a working call of a caller fails or reads something else |
 | scratch folder | a new, empty temporary folder where the tool may read and write |
 | design line | one planned change: the rule, what the tool will do, the file, and whether it breaks callers |
@@ -58,7 +59,7 @@ hints that run, options that list, next steps, nothing passes silently.
 
 **Move only along the rows of this table; a move missing from the table is a mistake to report.**
 
-**STOP** means: halt, say what happened, ask the user, and continue only along the row the user chose.
+**STOP** is a state of its own; its section follows 7 Hand over.
 
 | From | To | When |
 | :--- | :--- | :--- |
@@ -68,6 +69,7 @@ hints that run, options that list, next steps, nothing passes silently.
 | 1 Survey | 2 Check | the tool starts in a scratch folder and its map is written |
 | 1 Survey | STOP | the tool does not start in a scratch folder |
 | 2 Check | 3 Report | every rule in scope has a verdict with evidence |
+| 2 Check | STOP | a probe needs real data, an account or a paid service |
 | 3 Report | done | the mode is review, or no rule in scope is a gap |
 | 3 Report | 4 Design | the mode is fix and at least one rule in scope is a gap |
 | 4 Design | 5 Change | no design line breaks callers, or the user approved them |
@@ -76,8 +78,11 @@ hints that run, options that list, next steps, nothing passes silently.
 | 5 Change | STOP | a design line needs a new dependency |
 | 6 Verify | 5 Change | a probe or a check still fails (**back edge**, bound 3) |
 | 6 Verify | STOP | a probe or a check fails after three returns |
+| 6 Verify | STOP | a probe needs real data, an account or a paid service |
 | 6 Verify | 7 Hand over | every probe in scope passes and the project checks pass |
 | 7 Hand over | done | the hand-over report is given |
+| STOP | the state it left | the user's answer fits a row of it (**back edge**, bound 3) |
+| STOP | done | the user ends the run |
 
 ### 0 Scope
 
@@ -89,7 +94,8 @@ hints that run, options that list, next steps, nothing passes silently.
   'Build a CLI for agents that does X' is 'build'.
 - The tool: its entry point, its language, how it is started, and the commands it has.
 - The project checks: the test, lint and type check commands the project already runs.
-- For 'build': what the tool must do, and its language; the user's words, else the repository's language.
+- For 'build': what the tool must do, its language and its folder; the user's words, else the repository's
+  language and a new folder named after the tool.
 - When two modes fit equally, or the tool cannot be found, STOP and ask.
 
 ### 1 Survey
@@ -107,6 +113,8 @@ The map is a short list of files and lines, enough to find the evidence for each
 Note also whether an agent skill or another manual for agents ships with the tool.
 
 Start the tool in a scratch folder: alone, with its help, and with one command that only reads.
+Run each of these calls only when the map shows it writes, deletes and sends nothing outside that folder;
+a tool under review may ignore '--help' and run for real.
 A tool that does not start there goes to STOP: say what failed.
 
 ### 2 Check
@@ -188,6 +196,10 @@ Read `./references/design.md` before the first design line; it holds the shapes 
 - Three commands the user can run to see the rules hold: a success, a refusal, a dry run.
 - What is left: rules out of scope, 'n/a' verdicts worth a second look, and extra work noticed on the way.
 
-## On failure
+### STOP
 
-When something fails outside the rows of the table, say what failed and let the user decide.
+**Outcome: the user has answered, and the run goes on along a row of the state it left, or ends.**
+
+- Name the state and the row that led here, and what happened; a failure outside the rows comes here too.
+- Ask one question; give the choices, the recommended one first, each with its trade-off.
+- A choice no row covers ends the run.

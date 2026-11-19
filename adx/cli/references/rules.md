@@ -13,9 +13,11 @@ Part of states 2 Check and 6 Verify in `../SKILL.md`.
 
 The six rules marked 'article' come from Justin Poehnelt's article
 [Rewrite your CLI for AI agents](https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/) (2026).
-The nine marked 'oriko' are additions by the author of [oriko](https://github.com/honeyglass/oriko),
-a CV tool built to be driven by agents, from building tools for agents.
-The lines marked 'Lesson' under a probe come from oriko's fixes: each one closed a gap a run had shown.
+The nine marked 'addition' come from building tools for agents, first a CV tool,
+[oriko](https://github.com/honeyglass/oriko); no rule depends on it.
+The lines marked 'Lesson' under a probe come from fixes in a real tool: each one closed a gap a run had shown.
+A 'Lesson' or 'More probes' line is part of its rule: a tool that fails one is 'partly' or 'missing'.
+A 'Strong form' line is not needed for 'met'; name it in the report as a next step.
 
 ## The rules
 
@@ -27,15 +29,15 @@ The lines marked 'Lesson' under a probe come from oriko's fixes: each one closed
 | 4 | Input hardening | keeps every path inside an allowed folder and every id within allowed characters | a wrong or invented value never reads or writes elsewhere | article |
 | 5 | Dry runs | a command that writes or sends says what it would do, and does nothing | tries a command safely first | article |
 | 6 | Agent skill | ships a manual for agents with the code | knows the flow, and when to stop and ask the person | article |
-| 7 | Checks in layers | checks shape, then meaning, then the costly checks; answers all errors of a layer at once | fixes every real error in one round | oriko |
-| 8 | Errors with a hint | each error says where it is and what to change | fixes the input on its own | oriko |
-| 9 | All or nothing | a refused or failed command writes nothing | no file is left half changed | oriko |
-| 10 | Exit codes 0, 1, 2 | 0 success, 1 a refusal, 2 the tool broke | knows the next step from one number | oriko |
-| 11 | Plan before the file | shows the plan of the result before it writes the result | fixes a problem before the costly step | oriko |
-| 12 | Hints that run | a refusal names the command that lists the fitting values | runs it and picks a real value, not a guess | oriko |
-| 13 | Options that list | an option given without its value lists the values it accepts | finds names and ids in one call | oriko |
-| 14 | Next steps | the tool alone says where to start; a success names the commands that can follow, and what each still needs | always knows where to go on | oriko |
-| 15 | Nothing passes silently | refuses an unknown command, option, word or input field; a command group alone lists its actions | never acts on a typo | oriko |
+| 7 | Checks in layers | checks shape, then meaning, then the costly checks; answers all errors of a layer at once | fixes every real error in one round | addition |
+| 8 | Errors with a hint | each error says where it is and what to change | fixes the input on its own | addition |
+| 9 | All or nothing | a refused or failed command writes nothing | no file is left half changed | addition |
+| 10 | Exit codes 0, 1, 2 | 0 success, 1 a refusal, 2 the tool broke | knows the next step from one number | addition |
+| 11 | Plan before the file | shows the plan of the result before it writes the result | fixes a problem before the costly step | addition |
+| 12 | Hints that run | a refusal names the command that lists the fitting values | runs it and picks a real value, not a guess | addition |
+| 13 | Options that list | an option given without its value lists the values it accepts | finds names and ids in one call | addition |
+| 14 | Next steps | the tool alone says where to start; a success names the commands that can follow, and what each still needs | always knows where to go on | addition |
+| 15 | Nothing passes silently | refuses an unknown command, option, word or input field; a command group alone lists its actions | never acts on a typo | addition |
 
 ## The probes
 
@@ -101,7 +103,8 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
 
 - Probe: look for a skill file (such as 'SKILL.md') or another manual for agents shipped with the tool, and read it.
 - Met: the manual says when to use the tool, how to run it, what each answer asks the agent to do
-  (by exit code or kind), the flow of a typical task, and when to stop and ask the person.
+  (by exit code or kind), the flow of a typical task, when to stop and ask the person, and how many
+  retries come before that.
 - Fails when: the manual names commands, options or error codes the tool no longer has.
 - Strong form: a test or a generator keeps the manual in step with the tool.
   A program writes the facts that stand in the code (names, options, codes); a person or an agent writes only the prose.
@@ -148,6 +151,7 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
   2 means the tool broke; the codes never mix.
 - Strong form: a refusal also names its kind: 'fix' (the agent can fix the input), 'ask' (only the person can solve it),
   'retry' (a later call may succeed).
+- Lesson: a refusal of kind 'retry' from a call with an effect says in 'state' whether the call took effect.
 - Lesson: a failure of the system on a path the caller gave is a refusal with exit code 1, not a crash with 2.
 - Lesson: a missing program the person can install is a refusal of kind 'ask' with the install hint, not a fault of the tool.
 - Lesson: one place decides the kind, from two short lists of codes ('ask', 'retry'); every other code is 'fix'.

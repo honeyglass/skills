@@ -68,6 +68,7 @@ The layers run in order: arguments, then shape (the schema), then meaning (do th
 A layer runs only when the layers before it passed.
 
 - 'state' says what the failed call left. It is 'Nothing was written' unless a write failed halfway; then it names the files written.
+  After a 'bug' the tool cannot know what it left: 'state' says so and names a call that shows what is stored.
 - One function builds every refusal and decides the kind from two short lists of codes, one for 'ask' and one for 'retry'.
   Every other code is 'fix'. A system error nobody listed is 'ask': a case nobody planned goes to the person.
 - A failure of the system on a path the caller gave is a refusal. A missing program the person can install is 'ask', with the install hint.
@@ -139,7 +140,7 @@ The facts that stand in the code are written and checked by a program; the agent
 
 ## Tests that earn their place
 
-State 5 Change writes a test per rule. Each test below caught a real gap in oriko; plan the ones that fit the tool.
+State 5 Change writes a test per rule. Each test below caught a real gap in a real tool; plan the ones that fit the tool.
 
 - every example the tool ships passes its checks and builds
 - one call with several mistakes answers all of them
@@ -149,6 +150,6 @@ State 5 Change writes a test per rule. Each test below caught a real gap in orik
 - a value with a space, a quote or a leading dash comes back from the shell as itself
 - an option without a value answers its list; an option with a free value is refused by name
 - piped input is read only to one byte past the limit
-- a system error goes to the caller for a path the caller gave, and to the person for anything else
+- a system error on a path the caller gave answers a refusal with exit code 1, never a crash with exit code 2
 
 Then return to 4 Design.
