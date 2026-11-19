@@ -37,7 +37,8 @@ BADGES
 - The tagline is one sentence in bold that says what the project gives a person, not how it works.
 - The link line holds three to five links: sections of the README, a main docs page, the issues.
   A heading that opens with an icon gets the anchor '#-' and its words, such as '#-quickstart'.
-- A badge stands only for a fact of the fact sheet:
+- A badge stands only for a fact of the fact sheet; a colour a badge sets is the accent or the
+  badge's default, never one carried over from an old README:
 
 | Badge | Only when |
 | :--- | :--- |
@@ -61,16 +62,18 @@ A subheading, such as 'Why NAME?', is level three and has no icon.
 
 ## The sections
 
-The sections stand in this order. A section without facts stays out; the order of the rest holds.
+The sections stand in this order, each with its own icon: no icon opens two sections. A section
+without facts stays out; the order of the rest holds.
 
 | Section | Icon | Holds |
 | :--- | :--- | :--- |
 | What is NAME? | file-text | one paragraph in plain words on what the project does for a person, then 'Why NAME?' |
 | Quickstart | terminal | one bash block, each command under a comment line, then at most two short paragraphs |
+| Skills or Packages | package | one line per part, as Several parts says |
 | The recommended way | star | how a person gets the best result, when the project has one way that works best |
 | Your data | folder-lock | where the project keeps a person's files, when it keeps any |
 | Compatibility | plug | the platforms, versions and agents the project declares |
-| Principles | puzzle | two to four lines, each a bold link to where the principle is explained |
+| Principles | puzzle | two to four lines, each a bold link to where the principle is explained and one short sentence, no emoji |
 | Docs | book-open | one bold link per docs page, with no sentence after it |
 | Roadmap | map | a checkbox list of what comes next, in plain words |
 | Development | wrench | one paragraph that links the contributing guide, the code of conduct and the security policy |
@@ -95,11 +98,18 @@ A repository that holds several skills or packages gives each one line in the ro
 | NAME | [FOLDER/](FOLDER/README.md) | one line on what it does for a person |
 ```
 
-- The heading names the kind of part, such as Skills or Packages, with the icon puzzle.
-- The root README says nothing else about one part; its README holds the rest.
-- The README of a part holds its own install line, such as
-  'npx skills add https://github.com/OWNER/REPO --skill NAME' for a skill, its own sections in
-  the order above, and a last line that links back to the root README.
+- The heading names the kind of part, such as Skills or Packages, with the icon package.
+- The root README says nothing else about one part; its README holds the rest. A Principles line
+  may still link to the file of a part that explains the principle.
+- When the run writes the README of a part, it holds its own install line, such as
+  'npx skills add https://github.com/OWNER/REPO --skill NAME' for a skill, its own sections, in
+  the order above where they share a name, and a last line that links back to the repository.
+- A run on the root README changes no part's README; a part's README without its install line or
+  link back is named in 6 Hand over.
+- A part that an install copies on its own, such as a skill folder, holds no relative link out
+  of its folder: it opens with its name as a level-one heading, not the header, its headings go
+  without icons, and the link back is the full URL of the repository, since the copy has no
+  brand folder and no root README beside it.
 - The root Quickstart shows the one way to install a part, with one part as the example.
 
 ## How it reads

@@ -7,6 +7,12 @@ light and a dark version before each section.
 This README is for people. Claude Code reads [SKILL.md](SKILL.md) and the files in
 [references/](references/).
 
+## Install
+
+```bash
+npx skills add https://github.com/honeyglass/skills --skill docs-readme
+```
+
 ## What it does
 
 - **Facts, not guesses**: every sentence rests on a file of the repository or on your answer.
@@ -21,8 +27,9 @@ This README is for people. Claude Code reads [SKILL.md](SKILL.md) and the files 
 
 The skill surveys the repository, asks you in short rounds for what is open (the tagline, the
 colour, a logo, the principles, the roadmap), writes the brand files, drafts the README, checks
-its links, anchors, icons and facts, and hands it to you to read. Nothing is replaced without
-your word, and nothing is committed.
+its links, anchors, icons, facts and layout, and that no planning history stands in it, and
+hands it to you to read. Nothing is replaced without your word, and nothing is committed unless
+you ask.
 
 ## Files
 
@@ -32,5 +39,9 @@ your word, and nothing is committed.
 | [references/layout.md](references/layout.md) | the header, the sections and their order |
 | [references/icons.md](references/icons.md) | the icons, their colours, the header and the license of the icons |
 
-The icons are drawings of [Lucide](https://lucide.dev) under the ISC license; the skill writes
-that license beside them.
+The icons are drawings of [Lucide](https://lucide.dev) under the ISC license, some from Feather
+under the MIT license; the skill writes both licenses beside them.
+
+---
+
+[← honeyglass skills](https://github.com/honeyglass/skills)

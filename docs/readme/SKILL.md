@@ -1,6 +1,6 @@
 ---
 name: docs-readme
-description: Writes or rewrites the README.md of a repository in one fixed look, a centred header with a tagline, links and badges, a light and a dark icon before each section, and the sections What is it, Quickstart, Principles, Docs, Roadmap, Development and License. It takes every fact from the repository's files or the person's answers, writes the icons and the header into the brand folder in the project's own colours, and, for a repository of several skills or packages, keeps the root README to one line per part with a link to that part's own README. Use it whenever the user asks for a README, a better or new README, a project front page, icons before the headings, or a README that scales to more packages, even when the look is not named.
+description: Writes or rewrites the README.md of a repository in one fixed look, a centred header with a tagline, links and badges, a light and a dark icon before each section, and a fixed order of sections, from What is NAME? and Quickstart to Development and License. It takes every fact from the repository's files or the person's answers, writes the icons and the header into the brand folder in the project's own colours, and, for a repository of several skills or packages, keeps the root README to one line per part with a link to that part's own README. Use it whenever the user asks for a README, a better or new README, a project front page, icons before the headings, or a README that scales to more packages, even when the look is not named.
 ---
 
 1. The contract: every move is a row of the Flow table; a move missing from it is a bug, not an interpretation.
@@ -24,7 +24,7 @@ The icons, the header and the license text of the icons stand in `./references/i
 | :--- | :--- |
 | repository | the project whose README this run writes |
 | README | the file README.md at the root of the repository, or of one part |
-| part | a skill, a package or a folder with a README of its own inside the repository |
+| part | a skill or a package inside the repository that installs or publishes on its own and has a README of its own |
 | fact | a statement the README makes: a name, a command, a platform, a feature, a link |
 | fact sheet | the list of facts this run may use, each with its source: a file and line, or the person |
 | section | a heading of the README with its text, such as Quickstart |
@@ -56,15 +56,18 @@ The icons, the header and the license text of the icons stand in `./references/i
 
 | From | To | When |
 | :--- | :--- | :--- |
-| 0 Scope | 1 Survey | the repository and the README to write are known |
+| 0 Scope | 1 Survey | the README to write is known and may be written |
 | 0 Scope | STOP | the repository or the README is unclear |
+| 0 Scope | STOP | the README exists and the person did not ask to replace it |
 | 1 Survey | 2 Ask | the fact sheet is written |
 | 2 Ask | 2 Ask | an answer leaves a fact open (**back edge**, bound 3) |
-| 2 Ask | 3 Brand | every fact the layout needs has a value |
-| 2 Ask | STOP | a fact is still open after three rounds |
-| 3 Brand | 4 Draft | every icon and the header exist in light and dark |
+| 2 Ask | 3 Brand | every open fact is settled, for a README with icons |
+| 2 Ask | 4 Draft | every open fact is settled, for a part copied alone |
+| 2 Ask | STOP | a fact is still open after three returns |
+| 3 Brand | 4 Draft | the header, every icon and their LICENSE are written |
 | 3 Brand | STOP | a brand file would be replaced without the word |
 | 4 Draft | 5 Check | the README is written |
+| 4 Draft | STOP | a sentence needs a fact the fact sheet lacks |
 | 5 Check | 4 Draft | a check fails (**back edge**, bound 3) |
 | 5 Check | STOP | a check fails after three returns |
 | 5 Check | 6 Hand over | every check passes |
@@ -80,6 +83,7 @@ The icons, the header and the license text of the icons stand in `./references/i
 
 - The README is the root README, or the README of one part; a root README of a repository with
   several parts names each part in one line, as `./references/layout.md` says under Several parts.
+- An existing README is replaced only when the person asked for a new or rewritten README.
 - An existing README is input: its facts go to the fact sheet in 1 Survey, its wording does not bind.
 
 ### 1 Survey
@@ -94,10 +98,11 @@ The icons, the header and the license text of the icons stand in `./references/i
 
 ### 2 Ask
 
-**Outcome: every open fact has a value from the person's words, or the person dropped it.**
+**Outcome: every open fact is settled: it has a value from the person's words, or the person dropped it.**
 
 - One message per round, with the open facts as short questions, the most important first:
-  the tagline, the accent, a logo or none, the principles, the roadmap.
+  the tagline, the accent, a logo or none, who holds the rights to the brand folder, the
+  principles, the roadmap.
 - For the accent, propose the four colours of `./references/icons.md` from the one colour the
   person names, and take their answer as it stands.
 - A section whose facts the person drops stays out of the README.
@@ -119,13 +124,14 @@ The icons, the header and the license text of the icons stand in `./references/i
 
 ### 5 Check
 
-**Outcome: every check of the list below passes on the README as written.**
+**Outcome: every check of the list below passes on the README as written, read against `./references/layout.md`.**
 
 | Check | Passes when |
 | :--- | :--- |
 | links | every relative link and image path leads to a file that exists |
-| anchors | every link of the link line leads to a heading of the README |
-| icons | every heading names a light and a dark icon that exist in the brand folder |
+| anchors | every '#' link of the link line leads to a heading of the README |
+| icons | every level-two heading of a README beside the brand folder names a light and a dark icon that exist there; a part's README an install copies alone has none |
+| layout | the sections, their order, their form and their icons follow the layout, no icon twice |
 | facts | every fact of the README stands in the fact sheet |
 | process | no todo number, plan name, decision log or date of a decision stands in the README |
 | parts | the root README gives each part one line and a link to its README, no more |
@@ -134,7 +140,9 @@ The icons, the header and the license text of the icons stand in `./references/i
 
 **Outcome: the person has the README and the brand files, with every derived value named.**
 
-- Show the README unchanged and list the files written.
+- Show the README unchanged, list the files written and, for a README that existed, each fact
+  added, changed or dropped, with its reason.
+- Name each part's README that lacks its install line or its link back.
 - Name each value the agent derived rather than read, such as the four colours or a sentence
   that sums up two files, and ask the person to read the README before it is used.
 

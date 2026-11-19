@@ -18,7 +18,10 @@ The person names one accent, the colour of the project. The four colours of the 
 | Colour | Light version | Dark version |
 | :--- | :--- | :--- |
 | tile | a very light tint of the accent | a very dark shade of the accent |
-| line | a darker shade of the accent, readable on the light tile | the accent itself |
+| line | a darker shade of the accent | the accent itself, or a lighter tint when the accent fails the test below |
+
+Test: each line reaches a contrast of at least 3:1 against its tile (WCAG 2.2, 1.4.11 Non-text
+Contrast).
 
 An example, with the accent #5cc9a7: tile #e1f5ee and line #2a8f71 for the light version,
 tile #173a31 and line #5cc9a7 for the dark one.
@@ -34,7 +37,7 @@ Both hold this text, with the tile, the line and the drawing filled in:
 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="TILE"/><g transform="translate(4 4) scale(0.6667)" fill="none" stroke="LINE" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">DRAWING</g></svg>
 ```
 
-Write only the icons the README uses, and nothing else into `brand/icons/`.
+Write only the icons the README uses and their LICENSE, and nothing else into `brand/icons/`.
 
 ## The drawings
 
@@ -47,6 +50,7 @@ The drawing of each icon, from lucide-static 1.69.0, as it goes in place of DRAW
 | folder-lock | `<rect width="8" height="5" x="14" y="17" rx="1" /><path d="M10 20H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H20a2 2 0 0 1 2 2v2.5" /><path d="M20 17v-2a2 2 0 1 0-4 0v2" />` |
 | map | `<path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z" /><path d="M15 5.764v15" /><path d="M9 3.236v15" />` |
 | monitor | `<rect width="20" height="14" x="2" y="3" rx="2" /><line x1="8" x2="16" y1="21" y2="21" /><line x1="12" x2="12" y1="17" y2="21" />` |
+| package | `<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z" /><path d="M12 22V12" /><polyline points="3.29 7 12 12 20.71 7" /><path d="m7.5 4.27 9 5.15" />` |
 | plug | `<path d="M12 22v-5" /><path d="M15 8V2" /><path d="M17 8a1 1 0 0 1 1 1v4a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1z" /><path d="M9 8V2" />` |
 | puzzle | `<path d="M15.39 4.39a1 1 0 0 0 1.68-.474 2.5 2.5 0 1 1 3.014 3.015 1 1 0 0 0-.474 1.68l1.683 1.682a2.414 2.414 0 0 1 0 3.414L19.61 15.39a1 1 0 0 1-1.68-.474 2.5 2.5 0 1 0-3.014 3.015 1 1 0 0 1 .474 1.68l-1.683 1.682a2.414 2.414 0 0 1-3.414 0L8.61 19.61a1 1 0 0 0-1.68.474 2.5 2.5 0 1 1-3.014-3.015 1 1 0 0 0 .474-1.68l-1.683-1.682a2.414 2.414 0 0 1 0-3.414L4.39 8.61a1 1 0 0 1 1.68.474 2.5 2.5 0 1 0 3.014-3.015 1 1 0 0 1-.474-1.68l1.683-1.682a2.414 2.414 0 0 1 3.414 0z" />` |
 | scale | `<path d="M12 3v18" /><path d="m19 8 3 8a5 5 0 0 1-6 0zV7" /><path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1" /><path d="m5 8 3 8a5 5 0 0 1-6 0zV7" /><path d="M7 21h10" />` |
@@ -54,7 +58,8 @@ The drawing of each icon, from lucide-static 1.69.0, as it goes in place of DRAW
 | terminal | `<path d="M12 19h8" /><path d="m4 17 6-6-6-6" />` |
 | wrench | `<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z" />` |
 
-A section that needs an icon outside this list gets the closest one from the list.
+A section that needs an icon outside this list gets the closest one from the list that no other
+section of the README uses; when none is left, STOP and ask.
 A new drawing only comes from the person, with the Lucide name and version it comes from.
 
 ## The header
@@ -72,7 +77,7 @@ The header is two files, `brand/header.svg` and `brand/header-dark.svg`.
 
 The drawings come from Lucide under the ISC license; monitor and terminal come from Feather
 through Lucide, under the MIT license. Write `brand/icons/LICENSE` with this text; its Feather list
-names only the icons of the set above that come from Feather:
+names the Feather icons the brand folder holds, of monitor and terminal, in place of FEATHER_ICONS:
 
 ```text
 ISC License
@@ -95,7 +100,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 The following Lucide icons are derived from the Feather project:
 
-monitor, terminal
+FEATHER_ICONS
 
 The MIT License (MIT) (for the icons listed above)
 
