@@ -7,7 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test } from 'node:test';
-import { markdownFiles, skillFolders } from '../utils/files.ts';
+import { markdownFiles, ROOT, skillFolders } from '../utils/files.ts';
 import { linkProblems } from '../utils/links.ts';
 
 const read = (path: string) => readFileSync(path, 'utf8');
@@ -48,4 +48,12 @@ test('a missing file, a missing heading and a path out of the skill are each rep
       '../../../outside.md leaves the skill folder',
     ],
   );
+});
+
+test('a link inside HTML is refused, while HTML without a link reads as it is', () => {
+  const path = join(ROOT, 'sample.md');
+  assert.deepEqual(linkProblems(path, '<div align="center">\n\n[ok](./README.md)\n\n</div>\n'), []);
+  assert.deepEqual(linkProblems(path, '<a href="./gone.md">gone</a>\n'), [
+    `${path}: holds a link in HTML, which these tests cannot read`,
+  ]);
 });

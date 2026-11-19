@@ -4,8 +4,9 @@
  * Page, pageOf: the headings, links, code spans and tables of a file, and its anchors.
  * frontmatterOf: the lines between the two '---' fences at the top of a file.
  *
- * The only file that imports micromark. A link inside HTML is invisible to it, so a page tells
- * whether it holds HTML, and the caller refuses such a page instead of trusting a partial read.
+ * The only file that imports micromark. A link in an HTML attribute is invisible to it, so a page
+ * tells whether its HTML holds one, and the caller refuses such a page instead of trusting a
+ * partial read. HTML without a link, such as a centered block or a comment, reads as it is.
  *
  * @example const { links, tables } = pageOf(readFileSync(path, 'utf8'));
  */
@@ -22,7 +23,7 @@ export type Page = {
   codes: { text: string; line: number }[];
   tables: Table[];
   slugs: Set<string>;
-  html: boolean;
+  htmlLinks: boolean;
 };
 
 type Event = ReturnType<typeof postprocess>[number];
@@ -31,6 +32,8 @@ type Block = { token: Token; children: Token[] };
 
 const DESTINATIONS = new Set(['resourceDestinationString', 'definitionDestinationString']);
 const HTML = new Set(['htmlFlow', 'htmlText']);
+// The attributes of HTML that point to a file or a page.
+const HTML_LINK = /\b(href|src|srcset)\s*=/i;
 const CELLS = new Set(['tableHeader', 'tableData']);
 const LINE_ENDINGS = new Set(['lineEnding', 'lineEndingBlank']);
 const FENCE = '---';
@@ -57,7 +60,7 @@ export function pageOf(file: string): Page {
       })),
     tables: tablesOf(events, text),
     slugs: slugsOf(headings.map(heading => heading.text)),
-    html: tokens.some(token => HTML.has(token.type)),
+    htmlLinks: tokens.some(token => HTML.has(token.type) && HTML_LINK.test(sliceOf(text, token))),
   };
 }
 
