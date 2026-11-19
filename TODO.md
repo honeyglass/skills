@@ -1,7 +1,7 @@
 # TODO
 
 Open work on the skills of honeyglass and their package @honeyglass/skills.
-<!-- last item number: 8 -->
+<!-- last item number: 10 -->
 
 ## Next
 
@@ -18,3 +18,10 @@ Open work on the skills of honeyglass and their package @honeyglass/skills.
       after:#2
 - [ ] #8 Work out a base CLI that adx-cli brings along, which a tool built with the skill extends: it fixes the ADX principles in code, such as the strict parser, one JSON answer, refusals with a kind and exit codes 0, 1 and 2, dry runs and the schema command, so they hold by construction and can be checked deterministically instead of by an agent probing each tool; weigh it against the refusal library of #2 (added 2026-11-19)
       'package.json', 'adx/'
+
+## Docs
+
+- [ ] #9 Build a skill that writes a README in the style of oriko's: a centred header with the tagline, links and badges, a light and a dark icon before each section heading, and the sections What is it, Quickstart, Principles, Docs, Roadmap, Development and License; a repository that holds several skills or packages gets a short overview that names each one in a line and links to its own README (added 2026-11-19)
+- [ ] #10 Rewrite the README of this repository with the skill of #9: icons before the headings, text for every skill instead of adx-cli alone, and in each skill's README its install line, such as 'npx skills add https://github.com/honeyglass/skills --skill adx-cli' (added 2026-11-19)
+      after:#9
+      'README.md', 'adx/cli/README.md'

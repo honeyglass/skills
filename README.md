@@ -58,6 +58,7 @@ ADX stands for Agent Developer eXperience: how easy a tool is for an AI agent to
 - [ ] adx-cli follows the refusal library of `@honeyglass/utils`, and the rules a project may
       override, such as its error format, without depending on either
 - [ ] An MCP extension around an ADX tool, `adx/mcp`, beside `adx/cli`
+- [ ] A skill that writes a README in the style of [oriko](https://github.com/honeyglass/oriko)'s
 - [ ] Publish on npm as `@honeyglass/skills`
 
 ## Development
