@@ -51,6 +51,15 @@ such as [adx/cli/](adx/cli/), into `.claude/skills/adx-cli/` of a project or of 
 
 ADX stands for Agent Developer eXperience: how easy a tool is for an AI agent to use.
 
+## Roadmap
+
+- [ ] A base CLI that adx-cli brings along: a tool built with the skill extends it, so the ADX
+      principles hold by construction and a program can check them
+- [ ] adx-cli follows the refusal library of `@honeyglass/utils`, and the rules a project may
+      override, such as its error format, without depending on either
+- [ ] An MCP extension around an ADX tool, `adx/mcp`, beside `adx/cli`
+- [ ] Publish on npm as `@honeyglass/skills`
+
 ## Development
 
 How to set up, test and propose a change: [CONTRIBUTING.md](CONTRIBUTING.md). Everyone here
