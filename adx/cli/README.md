@@ -52,7 +52,7 @@ down for [oriko](https://github.com/honeyglass/oriko), a CV tool, and hold for a
 | 3 | JSON when piped | answers text at a terminal and JSON when a program reads it | article |
 | 4 | Input hardening | keeps every path inside an allowed folder and every id within allowed characters | article |
 | 5 | Dry runs | a command that writes or sends says what it would do, and does nothing | article |
-| 6 | Agent skill | ships a manual for agents, written as a state machine | article |
+| 6 | Agent skill | ships a manual for agents with the code; a state machine is its strong form | article |
 | 7 | Checks in layers | checks shape, then meaning, then the costly checks; answers all errors of a layer at once | addition |
 | 8 | Errors with a hint | each error says where it is and what to change | addition |
 | 9 | All or nothing | a refused or failed command writes nothing | addition |
@@ -78,7 +78,7 @@ for agents. It works in one of three modes, taken from your words:
 | build | 'build a CLI for agents that manages bookmarks' | designs all 15 rules, builds the tool and its agent skill, and proves each rule with a test |
 
 The skill never runs the tool against your real data or a paid service without asking, and it
-commits nothing.
+commits nothing unless you ask.
 
 ## What is inside
 

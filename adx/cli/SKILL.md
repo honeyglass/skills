@@ -1,6 +1,6 @@
 ---
 name: adx-cli
-description: Builds, reviews and fixes a command-line tool that an AI agent drives, including the agent skill the tool ships. It checks the tool against 15 Agent DX rules (JSON in and out, a schema at runtime, safe paths and ids, dry runs, errors with a hint, exit codes 0, 1, 2, a strict parser, an agent skill written as a state machine with bounded retries and a STOP that asks the person), reports each rule as met or not with evidence, and builds or changes the tool and its agent skill until the rules hold. Use it whenever the user builds, reviews or fixes a CLI that an agent will drive, writes or reviews the agent skill of such a tool, mentions Agent DX, or asks why an agent keeps failing with a command-line tool, even when the rules are not named.
+description: Builds, reviews and fixes a command-line tool that an AI agent drives, including the agent skill the tool ships. It checks the tool against 15 Agent DX rules (JSON in and out, a schema at runtime, safe paths and ids, dry runs, errors with a hint, exit codes 0, 1, 2, a strict parser, an agent skill with bounded retries and a point where the agent stops to ask the person, best written as a state machine), reports each rule as met or not with evidence, and builds or changes the tool and its agent skill until the rules hold. Use it whenever the user builds, reviews or fixes a CLI that an agent will drive, writes or reviews the agent skill of such a tool, mentions Agent DX, or asks why an agent keeps failing with a command-line tool, even when the rules are not named.
 ---
 
 1. The contract: every move is a row of the Flow table; a move missing from it is a bug, not an interpretation.
@@ -61,7 +61,7 @@ hints that run, options that list, next steps, nothing passes silently.
 
 ## Flow
 
-**Move only along the rows of this table; a move missing from the table is a mistake to report.**
+**Move only along the rows of this table; a case no row covers goes to STOP, which reports it.**
 
 **STOP** is a state of its own; its section follows 7 Hand over.
 
@@ -70,8 +70,8 @@ hints that run, options that list, next steps, nothing passes silently.
 | 0 Scope | 1 Survey | the mode is review or fix and the tool's code is at hand |
 | 0 Scope | 4 Design | the mode is build |
 | 0 Scope | STOP | the tool, its code or the mode is unclear |
-| 1 Survey | 2 Check | the tool starts in a scratch folder and its map is written |
-| 1 Survey | STOP | the tool does not start in a scratch folder |
+| 1 Survey | 2 Check | the map is written; the tool starts, or a run is unsafe |
+| 1 Survey | STOP | a safe run fails to start the tool |
 | 2 Check | 3 Report | every rule in scope has a verdict with evidence |
 | 2 Check | STOP | a probe needs real data, an account or a paid service |
 | 3 Report | done | the mode is review, or no rule in scope is a gap |
@@ -87,7 +87,7 @@ hints that run, options that list, next steps, nothing passes silently.
 | 6 Verify | 7 Hand over | every probe in scope passes and the project checks pass |
 | 7 Hand over | done | the hand-over report is given |
 | STOP | the state it left | the user's answer fits a row of it (**back edge**, bound 3) |
-| STOP | done | the user ends the run |
+| STOP | done | the user ends it, no row fits, or the bound is reached |
 
 ### 0 Scope
 
@@ -120,7 +120,7 @@ Note also whether an agent skill or another manual for agents ships with the too
 Start the tool in a scratch folder: alone, with its help, and with one command that only reads.
 Run each of these calls only when the map shows it writes, deletes and sends nothing outside that folder;
 a tool under review may ignore '--help' and run for real.
-A tool that does not start there goes to STOP: say what failed.
+A tool that does not start there goes to STOP: say what failed. When no call is safe to run, every verdict is 'code only'.
 
 ### 2 Check
 
@@ -168,6 +168,7 @@ In 'fix' mode with at least one gap, the run goes on to 4 Design; otherwise the 
 
 **Outcome: one design line for every gap, or for every rule in scope in 'build' mode, each marked breaking or not.**
 
+In 'build' mode, read `./references/rules.md` first; it holds each rule the design must meet.
 Read `./references/design.md` before the first design line; it holds the shapes that close several rules at once.
 Read `./references/agent-skill.md` before the design line of rule 6; it holds how the agent skill is written.
 
@@ -194,6 +195,8 @@ Read `./references/agent-skill.md` before the design line of rule 6; it holds ho
 
 **Outcome: every rule in scope has a fresh verdict from a fresh probe, and the project checks pass.**
 
+Read `./references/rules.md` before the first probe, and `./references/agent-skill.md` before the probe of rule 6, unless 2 Check read them in this run.
+
 - Run the probes of every rule in scope again, not only the changed ones: a change for one rule can break another.
 - A probe or a project check that still fails goes back to 5 Change with its evidence; at most three returns, then STOP.
 
@@ -212,4 +215,4 @@ Read `./references/agent-skill.md` before the design line of rule 6; it holds ho
 
 - Name the state and the row that led here, and what happened; a failure outside the rows comes here too.
 - Ask one question; give the choices, the recommended one first, each with its trade-off.
-- A choice no row covers ends the run.
+- A choice no row covers ends the run, and so does a fourth return.

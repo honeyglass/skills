@@ -1,13 +1,13 @@
 ---
 reference:
-  reads-in: 4 Design
+  reads-in: 4 Design, 5 Change
   before: the first design line
-  return-to: 4 Design
+  return-to: the state that read it
 ---
 
 # Shapes that close several rules at once
 
-Part of state 4 Design in `../SKILL.md`.
+Part of states 4 Design and 5 Change in `../SKILL.md`.
 
 **Build one shape for every answer, one for every error and one schema, and most rules follow from them.**
 
@@ -183,7 +183,7 @@ State 4 Design stops and asks the user; two common answers:
 
 State 5 Change writes a test per rule. Each test below caught a real gap in a real tool; plan the ones that fit the tool.
 
-- every example the tool ships passes its checks and builds
+- every example the tool ships passes its checks
 - one call with several mistakes answers all of them
 - a refused write leaves none of the files of the command; a write that fails halfway names what it wrote
 - a write never follows a link out of the allowed folder
@@ -193,4 +193,4 @@ State 5 Change writes a test per rule. Each test below caught a real gap in a re
 - piped input is read only to one byte past the limit
 - a system error on a path the caller gave answers a refusal with exit code 1, never a crash with exit code 2
 
-Then return to 4 Design.
+Then return to the state that sent you here: 4 Design or 5 Change.

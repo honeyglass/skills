@@ -64,7 +64,7 @@ A value in a When cell stands in single quotes.
 **Every case that only the person may decide has a row to STOP.**
 Typical STOP rows:
 
-- a refusal of kind 'ask' or 'bug'
+- a refusal of kind 'ask', or an answer of kind 'bug' (the tool broke, exit code 2)
 - the bound of a back edge is reached
 - an input is missing or unclear
 - the agent would add a fact the person did not give, or raise a limit
@@ -81,14 +81,14 @@ STOP has rows out of it: one back to the state it left (marked and bounded), and
 
 | Weak | Strong |
 | :--- | :--- |
-| 'Run the check command, then read the output.' | 'Exit: the check command answers ok.' |
-| 'Look at every field carefully.' | 'Exit: every field has a value from the source text.' |
+| 'Run the check command, then read the output.' | 'Outcome: the check command answers ok.' |
+| 'Look at every field carefully.' | 'Outcome: every field has a value from the source text.' |
 
 Keep the way open where the order of actions does not matter.
 Keep a prohibition where breaking it leaves no signal the agent could see, such as 'never invent a fact'.
 A state that fixes refusals carries a table from refusal code to change, so the agent changes only
 what the refusal names.
-In that table, order the changes of one code from the least loss to the most, such as 'first clear a pin, then hide a part'.
+In that table, order the changes of one code from the least loss to the most, such as 'first shorten a value, then drop an optional field'.
 A code whose fix belongs to the person says so in its row: STOP and ask.
 
 A prohibition needs a test the agent can apply, and one example.
@@ -148,7 +148,7 @@ An agent skill that books supplier invoices from PDFs into a ledger file through
 | 2 Draft | 3 Check | the draft entry is stored |
 | 2 Draft | STOP | a field is missing from the invoice |
 | 3 Check | 2 Draft | 'ledger check' refuses, kind fix (**back edge**, bound 3) |
-| 3 Check | STOP | a fourth refusal, or a refusal of kind ask or bug |
+| 3 Check | STOP | a fourth refusal, a refusal of kind ask, or a bug |
 | 3 Check | 4 Confirm | 'ledger check' answers ok |
 | 4 Confirm | 5 Book | the person approves the entry |
 | 4 Confirm | 2 Draft | the person asks for a change (**back edge**, bound 3) |
@@ -157,7 +157,7 @@ An agent skill that books supplier invoices from PDFs into a ledger file through
 | 5 Book | STOP | 'ledger add' refuses |
 | 6 Report | done | the report is given |
 | STOP | the state it left | the answer fits a row of it (**back edge**, bound 3) |
-| STOP | done | the person ends the run |
+| STOP | done | the person ends it, or the bound is reached |
 
 The agent reads the PDF and fills the fields (judgment).
 'ledger check' tests the shape, the sums, the tax rate and that the invoice number is new (rules).
@@ -175,7 +175,7 @@ That every command, option and refusal code the agent skill names exists in the 
 | F2 | Is the transition table complete and placed before the first state? |
 | F3 | Does every refusal of kind fix lead back to the state that made the input? |
 | F4 | Is every back edge marked and bounded, with a STOP when the bound is reached? |
-| F5 | Does every refusal of kind ask or bug, and every missing input, lead to STOP? |
+| F5 | Does every refusal of kind ask, every answer of kind bug, and every missing input lead to STOP? |
 | F6 | Does every state name the outcome at its exit? |
 | F7 | Does every step the agent can take match a row of the table? |
 | F8 | Is STOP its own state, which asks the person one question and continues only along the answer? |
@@ -187,7 +187,7 @@ That every command, option and refusal code the agent skill names exists in the 
 ## In a review
 
 Write the flow the agent skill has now, even when it is plain prose, and answer F1 to F12 on it.
-A loop without a bound also fails 'met' of rule 6: the manual must say how many retries come before it asks.
+A loop without a bound also fails 'met' of rule 6: the manual must say how many times the agent calls again after a refusal of any kind before it asks.
 A rule the agent skill states that a program could check, such as 'the version must be higher than the last',
 is a gap of rule 7: the rule belongs in the tool's checks, where the agent cannot skip it.
 

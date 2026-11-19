@@ -26,12 +26,12 @@ node bin/tasks.mjs add --json '{"title":"Buy milk","priority":"high","due":"2026
 | Exit code | Answer | What you do |
 | :--- | :--- | :--- |
 | 0 | '"ok": true' | read 'result'; pick the next call from 'next', each with what it does |
-| 1 | '"kind": "fix"' | change the input as each issue's 'hint' says, or run its 'command' to see the fitting values |
+| 1 | '"kind": "fix"' | change the input as each issue's 'hint' says, or run its 'command' to see the fitting values; after three refusals of one call, stop and ask the person |
 | 1 | '"kind": "ask"' | stop and ask the person; the issue says what they must decide or repair |
 | 1 | '"kind": "retry"' | call again a little later, at most three times; then stop and ask the person |
 | 2 | '"kind": "bug"' | stop and report the answer to the person; run 'list' before you call a writing command again |
 
-A refusal lists every issue it found in one answer, and its 'state' says what the call left: 'Nothing was written.'
+A refusal lists every issue it found in one answer, and its 'state' says what the call left, such as 'Nothing was written.'
 Each issue has 'code', 'path', 'message', 'hint' and, where one helps, a 'command' that runs as it stands.
 
 ## A typical task

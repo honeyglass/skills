@@ -1,20 +1,19 @@
 ---
 reference:
-  reads-in: 2 Check, 6 Verify
+  reads-in: 2 Check, 4 Design, 6 Verify
   before: the first verdict, and again before the probes of 6 Verify
   return-to: the state that read it
 ---
 
 # The 15 Agent DX rules and their probes
 
-Part of states 2 Check and 6 Verify in `../SKILL.md`.
+Part of states 2 Check, 4 Design and 6 Verify in `../SKILL.md`.
 
 **Each rule says what the tool does; its probe says how to see whether the tool does it.**
 
 The six rules marked 'article' come from Justin Poehnelt's article
 [Rewrite your CLI for AI agents](https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/) (2026).
-The nine marked 'addition' come from building tools for agents, first a CV tool,
-[oriko](https://github.com/honeyglass/oriko); no rule depends on it.
+The nine marked 'addition' come from building tools for agents.
 The lines marked 'Lesson' under a probe come from fixes in a real tool: each one closed a gap a run had shown.
 A 'Lesson' or 'More probes' line is part of its rule: a tool that fails one is 'partly' or 'missing'.
 A 'Strong form' line is not needed for 'met'; name it in the report as a next step.
@@ -79,7 +78,7 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
 - Check after each probe that nothing outside the scratch folder changed.
 - More probes: an input far larger than any real one, through a file and through stdin; a folder where a file belongs;
   a text field with a line break, a control character or an invisible character; an empty value for the data folder.
-- Lesson: a name is looked up among the things that exist, never turned into a path, so no name leads out of the folder.
+- Lesson: the name of a stored item is looked up among the items that exist, never turned into a path, so no name leads out of the folder.
 - Lesson: the kind and the size of a file come from the opened file, and the read stops at the limit;
   a check before the open can be passed by a file that is swapped afterwards.
 - Lesson: every text field is one visible line, so no value hides text or forges a line of the tool's output.
@@ -104,7 +103,7 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
 - Probe: look for a skill file (such as 'SKILL.md') or another manual for agents shipped with the tool, and read it.
 - Met: the manual says when to use the tool, how to run it, what each answer asks the agent to do
   (by exit code or kind), the flow of a typical task, when to stop and ask the person, and how many
-  retries come before that.
+  times the agent calls again after a refusal of any kind before it asks.
 - Fails when: the manual names commands, options or error codes the tool no longer has.
 - Strong form: the manual is a state machine, and every item F1 to F12 of `./agent-skill.md` holds:
   numbered states, a transition table before the first state, back edges bounded at 3, STOP as a state of its own.
@@ -120,6 +119,8 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
 - Met: one call answers every error of the first layer that fails, not only the first error;
   a later layer runs only when the earlier ones pass.
 - More probes: two wrong option values in one call; a command with several inputs, each one wrong.
+- More probes: read the agent skill for rules a program could check, such as 'the version must be higher than the last';
+  each one the tool does not check is a gap of this rule.
 - Lesson: the arguments of the call are a layer too. A command that returns at its first wrong option costs one call per mistake.
 - Lesson: a command with several inputs answers the issues of all of them, and then stores none.
 - Lesson: the command that stores an input runs the same checks as the command that plans the result,
@@ -153,7 +154,7 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
 - Met: 0 means success, 1 means a refusal (the agent fixes the input, asks the person, or retries),
   2 means the tool broke; the codes never mix.
 - Strong form: a refusal also names its kind: 'fix' (the agent can fix the input), 'ask' (only the person can solve it),
-  'retry' (a later call may succeed).
+  'retry' (a later call may succeed); a fault of the tool answers the kind 'bug' with exit code 2.
 - Lesson: a refusal of kind 'retry' from a call with an effect says in 'state' whether the call took effect.
 - Lesson: a failure of the system on a path the caller gave is a refusal with exit code 1, not a crash with 2.
 - Lesson: a missing program the person can install is a refusal of kind 'ask' with the install hint, not a fault of the tool.
@@ -182,7 +183,7 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
 - Met: the tool answers the values the option accepts, instead of a parse error,
   from the same source its validation uses.
 - Lesson: an option with a free value, such as a path, has no list. Given empty, it is refused by name, with a hint that says what to add.
-- Lesson: an option that takes a new name answers the names already taken.
+- Lesson: an option that names a new stored item answers the names already taken; a file name is a path (rule 4).
 - Lesson: two list options left empty in one call are refused; one list per call keeps the answer clear.
 - Lesson: a list that depends on another value, such as the parts of one item, names the missing value instead of guessing it.
 
@@ -194,7 +195,8 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
 - The tool only names a step and never runs one.
 - Lesson: the steps follow from the facts of the answer, not only from the command:
   with no item yet the step creates one, and with exactly one item the step names it.
-- Lesson: every named command is one the tool knows and carries the data folder and the names of the call. A test checks both.
+- Lesson: every named command is one the tool knows and carries the data folder and the names of the call.
+- Strong form: a test runs every named command and expects the tool to know it.
 - Lesson: a step without a command is for the person, such as an upload by hand.
 - Lesson: an answer after which nothing follows names no step; an empty or invented step sends the agent in a circle.
 
@@ -209,4 +211,4 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
   To name every mistake, read all arguments in the lenient mode and check each one yourself.
 - Lesson: a default is safe only when exactly one candidate exists. With several, refuse and list them.
 
-Then return to the state that sent you here: 2 Check or 6 Verify.
+Then return to the state that sent you here: 2 Check, 4 Design or 6 Verify.
