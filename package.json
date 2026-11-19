@@ -1,0 +1,22 @@
+{
+  "name": "@honeyglass/skills",
+  "private": true,
+  "license": "MIT",
+  "description": "Agent skills of honeyglass, starting with adx-cli for command-line tools that an AI agent drives.",
+  "type": "module",
+  "scripts": {
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "devDependencies": {
+    "lint-staged": "17.6.0",
+    "prettier": "3.9.10"
+  },
+  "packageManager": "pnpm@12.9.0+sha512.8f64efa0b792986ca98ae568791bcd7722807e274c4f0c1d9853c62116495c584119db98762a2a5343b1684d361b9ae26fdd16d551666d7635346d3fae830ddd",
+  "lint-staged": {
+    "*": "prettier --write --ignore-unknown"
+  }
+}
