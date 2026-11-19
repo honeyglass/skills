@@ -67,7 +67,13 @@ Each rule, its probe and the lessons behind it stand in [references/rules.md](re
 
 ## How to use it
 
-Copy the folder into the `.claude/skills/` folder of a project, or into `~/.claude/skills/`.
+Install it with the [skills CLI](https://skills.sh), which a later run also updates:
+
+```bash
+npx skills add honeyglass/skills --skill adx-cli -g -y
+```
+
+Or copy this folder into `.claude/skills/adx-cli/` of a project, or into `~/.claude/skills/`.
 Then type `/adx-cli` in Claude Code, or just ask; the skill also starts when you talk about a CLI
 for agents. It works in one of three modes, taken from your words:
 
