@@ -139,6 +139,20 @@ Example: a tailored copy lists a skill the source never names; the tool refuses 
 - A default applies only when exactly one candidate exists; with several, the tool refuses and names the list command.
 - A command group without its action lists its actions; the tool alone answers where to start.
 
+## Answers the caller can cut (2, 13, 14, 15, 16)
+
+**A command whose answer grows with the data answers an outline, and the caller names what it wants in full.**
+
+- The table of commands declares the fields of each such answer, as it declares the input.
+  The schema command lists them, the field option without a value answers them, and an unknown field is an issue.
+- Without named fields, 'result' is an outline: one entry per item, with its name and the facts that tell
+  the items apart. 'next' names the call that answers one item in full, with the item's name in 'needs'.
+- With named fields, such as '--fields name,status', each item in 'result' holds those fields and no other,
+  each one whole; 'ok' and 'next' stay.
+- The cut runs on the finished answer, after every check, so the outline and the full answer never disagree.
+- A list without a fixed end answers in pages: each page is one answer, and its 'next' names the call for the following page.
+- The agent skill says which fields a typical task needs, so the agent names them on the first call.
+
 ## The agent skill (6)
 
 The agent skill ships with the tool and holds:

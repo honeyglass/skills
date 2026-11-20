@@ -5,13 +5,13 @@ reference:
   return-to: the state that read it
 ---
 
-# The 15 Agent DX rules and their probes
+# The 16 Agent DX rules and their probes
 
 Part of states 2 Check, 4 Design and 6 Verify in `../SKILL.md`.
 
 **Each rule says what the tool does; its probe says how to see whether the tool does it.**
 
-The six rules marked 'article' come from Justin Poehnelt's article
+The seven rules marked 'article' come from Justin Poehnelt's article
 [Rewrite your CLI for AI agents](https://justin.poehnelt.com/posts/rewrite-your-cli-for-ai-agents/) (2026).
 The nine marked 'addition' come from building tools for agents.
 The lines marked 'Lesson' under a probe come from fixes in a real tool: each one closed a gap a run had shown.
@@ -37,6 +37,7 @@ A 'Strong form' line is not needed for 'met'; name it in the report as a next st
 | 13 | Options that list | an option given without its value lists the values it accepts | finds names and ids in one call | addition |
 | 14 | Next steps | the tool alone says where to start; a success names the commands that can follow, and what each still needs | always knows where to go on | addition |
 | 15 | Nothing passes silently | refuses an unknown command, option, word or input field; a command group alone lists its actions | never acts on a typo | addition |
+| 16 | Context discipline | a large answer comes as an outline, and the caller names the fields or the one item it wants in full | keeps its context for the task, not for fields it never reads | article |
 
 ## The probes
 
@@ -210,5 +211,22 @@ Run every command an answer names (in a hint, or as a next step) exactly as it s
 - Lesson: the strict mode of many argument parsers stops at the first unknown option.
   To name every mistake, read all arguments in the lenient mode and check each one yourself.
 - Lesson: a default is safe only when exactly one candidate exists. With several, refuse and list them.
+
+### 16 Context discipline
+
+- Probe: list the commands whose answer grows with the data, such as a list, a whole stored document
+  or a text read from outside. Run each on the largest sample at hand, then again with one or two named
+  fields, and once with a field the answer does not have.
+- Met: every such command answers a short outline by default, one entry per item with its name, and takes
+  the fields the caller names, through an option such as '--fields'; each named field comes back whole,
+  and the next step names the call that answers one item in full, with the item's name in what it still needs.
+- More probes: the field option without a value lists the fields it accepts (rule 13), and an unknown
+  field is refused (rule 15).
+- More probes: a list without a fixed end answers in pages, each page one answer whose next step names
+  the following page, so the agent can stop after the part it needs.
+- More probes: the agent skill names the fields a typical task needs.
+- Fails when: a field the caller named comes back cut short, or a large field, such as the body of a
+  document, cannot be left out.
+- n/a: every answer is small and of a fixed size, such as a status or one short stored item.
 
 Then return to the state that sent you here: 2 Check, 4 Design or 6 Verify.

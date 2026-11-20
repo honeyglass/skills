@@ -1,6 +1,6 @@
 ---
 name: adx-cli
-description: Builds, reviews and fixes a command-line tool that an AI agent drives, including the agent skill the tool ships. It checks the tool against 15 Agent DX rules (JSON in and out, a schema at runtime, safe paths and ids, dry runs, errors with a hint, exit codes 0, 1, 2, a strict parser, an agent skill with bounded retries and a point where the agent stops to ask the person, best written as a state machine), reports each rule as met or not with evidence, and builds or changes the tool and its agent skill until the rules hold. Use it whenever the user builds, reviews or fixes a CLI that an agent will drive, writes or reviews the agent skill of such a tool, mentions Agent DX, or asks why an agent keeps failing with a command-line tool, even when the rules are not named.
+description: Builds, reviews and fixes a command-line tool that an AI agent drives, including the agent skill the tool ships. It checks the tool against 16 Agent DX rules (JSON in and out, a schema at runtime, safe paths and ids, dry runs, errors with a hint, exit codes 0, 1, 2, a strict parser, answers cut to what the agent needs, an agent skill with bounded retries and a point where the agent stops to ask the person, best written as a state machine), reports each rule as met, partly met, missing or n/a with evidence, and builds or changes the tool and its agent skill until the rules hold. Use it whenever the user builds, reviews or fixes a CLI that an agent will drive, writes or reviews the agent skill of such a tool, mentions Agent DX, or asks why an agent keeps failing with a command-line tool, even when the rules are not named.
 ---
 
 1. The contract: every move is a row of the Flow table; a move missing from it is a bug, not an interpretation.
@@ -15,15 +15,15 @@ An agent cannot click through a menu or guess what a vague error means; the agen
 A CLI meets the Agent DX rules when every answer tells the agent what happened and what it can do next.
 
 This skill builds, reviews and fixes a CLI for agents, including the agent skill the CLI ships.
-It checks the tool against 15 rules, each verdict with evidence.
+It checks the tool against 16 rules, each verdict with evidence.
 When the user asks for it, it builds a new tool or changes an existing one, its agent skill included, until the rules hold.
 The agent skill (rule 6) tells the agent which command to run when, and when to stop and ask the person;
 `./references/agent-skill.md` says how to write it as a state machine.
 
-The 15 rules, each with its probe, stand in `./references/rules.md`:
+The 16 rules, each with its probe, stand in `./references/rules.md`:
 raw JSON input, schema at runtime, JSON when piped, input hardening, dry runs, agent skill,
 checks in layers, errors with a hint, all or nothing, exit codes 0, 1, 2, plan before the file,
-hints that run, options that list, next steps, nothing passes silently.
+hints that run, options that list, next steps, nothing passes silently, context discipline.
 
 ## Words
 
@@ -31,12 +31,12 @@ hints that run, options that list, next steps, nothing passes silently.
 | :--- | :--- |
 | tool | the command-line program under review, or the one being built |
 | mode | 'review' (check and report), 'fix' (check, then change the tool) or 'build' (a new tool) |
-| rule in scope | a rule this run checks; all 15, unless the user named fewer |
+| rule in scope | a rule this run checks; all 16, unless the user named fewer |
 | probe | the run or the code reading that tests one rule, as `./references/rules.md` lists it |
 | verdict | 'met', 'partly' (some commands fail it), 'missing' or 'n/a' (with a reason) |
 | evidence | a command that was run, with its output and exit code, or a file and line of the tool's code |
 | gap | a rule in scope with the verdict 'partly' or 'missing' |
-| caller | a script, an agent or a person that already relies on the tool's output |
+| caller | a script, an agent or a person that calls the tool and relies on its output |
 | person | in the rules, the human whom an agent driving the tool stops and asks |
 | agent skill | the manual for agents that ships with the tool, such as a SKILL.md (rule 6) |
 | breaking change | a change after which a working call of a caller fails or reads something else |
@@ -158,9 +158,10 @@ Met: N of M rules in scope (n/a: K)
 
 Order the gaps by harm to an agent:
 
-1. The agent acts on something wrong without noticing: nothing passes silently, all or nothing, input hardening.
+1. The agent acts on something wrong without noticing: nothing passes silently, all or nothing, input hardening,
+   a named field cut short (context discipline).
 2. The agent cannot read the answer: JSON when piped, exit codes, errors with a hint.
-3. The agent needs extra calls or guesses: all the other rules.
+3. The agent needs extra calls, guesses, or fills its context: all the other rules.
 
 In 'fix' mode with at least one gap, the run goes on to 4 Design; otherwise the report ends the run.
 

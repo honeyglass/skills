@@ -50,7 +50,7 @@ or for your user. To install by hand, copy the skill folder, such as [adx/cli/](
 
 | Skill | Folder | What it does |
 | :--- | :--- | :--- |
-| adx-cli | [adx/cli/](adx/cli/README.md) | builds, reviews and fixes a command-line tool that an AI agent drives, against 15 Agent DX rules |
+| adx-cli | [adx/cli/](adx/cli/README.md) | builds, reviews and fixes a command-line tool that an AI agent drives, against 16 Agent DX rules |
 | docs-readme | [docs/readme/](docs/readme/README.md) | writes the README of a repository in one fixed look, with icons in the project's colours |
 
 ## <picture><source media="(prefers-color-scheme: dark)" srcset="brand/icons/puzzle-dark.svg"><img src="brand/icons/puzzle.svg" width="24" height="24" alt=""></picture> Principles
